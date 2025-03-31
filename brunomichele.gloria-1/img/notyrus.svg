@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400" width="200" height="400">
+  <!-- Mantello (a forma di parabola, senza bordo in basso) -->
+  <path d="M 70 120 Q 100 50, 130 120 C 130 200, 70 200, 70 120" fill="red" stroke="black" stroke-width="3"/>
+  
+  <!-- Testa -->
+  <circle cx="100" cy="80" r="40" fill="white" stroke="black" stroke-width="2"/>
+  
+  <!-- Occhi -->
+  <circle cx="85" cy="75" r="5" fill="black"/>
+  <circle cx="115" cy="75" r="5" fill="black"/>
+  
+  <!-- Bocca -->
+  <path d="M 85 95 Q 100 110 115 95" fill="transparent" stroke="black" stroke-width="2"/>
+  
+  <!-- Corpo (prima della sciarpa) -->
+  <line x1="100" y1="120" x2="100" y2="200" stroke="black" stroke-width="3"/>
+  
+  <!-- Braccio sinistro -->
+  <line x1="100" y1="130" x2="60" y2="150" stroke="black" stroke-width="3"/>
+  <!-- Mano sinistra -->
+  <circle cx="55" cy="160" r="10" fill="white" stroke="black" stroke-width="2"/>
+  
+  <!-- Braccio destro -->
+  <line x1="100" y1="130" x2="140" y2="150" stroke="black" stroke-width="3"/>
+  <!-- Mano destra -->
+  <circle cx="145" cy="160" r="10" fill="white" stroke="black" stroke-width="2"/>
+  
+  <!-- Fianchi -->
+  <line x1="100" y1="200" x2="80" y2="240" stroke="black" stroke-width="3"/>
+  <line x1="100" y1="200" x2="120" y2="240" stroke="black" stroke-width="3"/>
+  
+  <!-- Sciarpa (sopra il corpo, copre il collo) -->
+  <path d="M 60 105 Q 75 120 100 120 Q 125 120 140 105" fill="red" stroke="black" stroke-width="2"/>
+  <path d="M 60 115 Q 75 130 100 130 Q 125 130 140 115" fill="red" stroke="black" stroke-width="2"/>
+</svg>
+

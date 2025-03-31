@@ -1,0 +1,54 @@
+@keyframes notyrusSpawn {
+	0% {transform: translateX(0vw) translateY(100vh); opacity: 1;} 
+	45% {transform: translateX(0vw) translateY(81vh); opacity: 1;} 
+	50% {transform: translateX(0vw) translateY(82vh); opacity: 1;}
+    60% {transform: translateX(0vw) translateY(82vh); opacity: 1;}
+    100% {transform: translateX(110vw) translateY(82vh); opacity: 1;}
+}
+
+@keyframes notyrusScrollB-LR {
+	0% {transform: translateX(-10vw) translateY(83vh);  opacity: 1;} 
+	100% {transform: translateX(110vw) translateY(83vh);  opacity: 1;} 
+}
+
+@keyframes notyrusScrollB-RL {
+    0% {transform: translateX(110vw) translateY(83vh);  opacity: 1;}
+    100% {transform: translateX(-10vw) translateY(83vh);  opacity: 1;}
+}
+
+@keyframes notyrusScrollT-LR {
+    0% {transform: translateX(-10vw) translateY(-21vh) rotate(0deg);  opacity: 1;} 
+    1% {transform: translateX(-10vw) translateY(-21vh) rotate(180deg);  opacity: 1;}
+    100% {transform: translateX(110vw) translateY(-21vh) rotate(180deg); opacity: 1}
+}
+
+@keyframes notyrusScrollT-RL {
+    0% {transform: translateX(110vw) translateY(-21vh) rotate(0deg);  opacity: 1;}
+    1% {transform: translateX(110vw) translateY(-21vh) rotate(180deg);  opacity: 1;}
+    100% {transform: translateX(-10vw) translateY(-21vh) rotate(180deg); opacity: 1}
+}
+
+@keyframes notyrusScrollR-BT {
+	0% {transform: translateX(96vw) translateY(110vh) rotate(0deg);  opacity: 1;} 
+	1% {transform: translateX(96vw) translateY(110vh) rotate(-90deg);  opacity: 1;}
+	100% {transform: translateX(96vw) translateY(-30vh) rotate(-90deg); opacity: 1}
+}
+
+
+@keyframes notyrusScrollR-TB {
+    0% {transform: translateX(96vw) translateY(-30vh) rotate(0deg);  opacity: 1;} 
+    1% {transform: translateX(96vw) translateY(-30vh) rotate(-90deg);  opacity: 1;}
+    100% {transform: translateX(96vw) translateY(110vh) rotate(-90deg); opacity: 1}
+}
+
+@keyframes notyrusScrollL-BT {
+    0% {transform: translateX(-6vw) translateY(110vh) rotate(0deg);  opacity: 1;} 
+    1% {transform: translateX(-6vw) translateY(110vh) rotate(90deg);  opacity: 1;}
+    100% {transform: translateX(-6vw) translateY(-30vh) rotate(90deg); opacity: 1}
+}
+
+@keyframes notyrusScrollL-TB {
+    0% {transform: translateX(-6vw) translateY(-30vh) rotate(0deg);  opacity: 1;} 
+    1% {transform: translateX(-6vw) translateY(-30vh) rotate(90deg);  opacity: 1;}
+    100% {transform: translateX(-6vw) translateY(110vh) rotate(90deg); opacity: 1}
+}
