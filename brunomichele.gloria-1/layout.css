@@ -20,3 +20,36 @@ body {
     opacity: 1;
     animation-fill-mode: forwards;
 }
+
+.bone{
+    width: 100px;
+    height: 800px;
+    position: absolute;
+    transform-origin:center;
+    z-index: 2;
+    opacity: 1;
+    animation-fill-mode: forwards;
+}
+
+.boneBox {
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+.boneBox > * {
+    margin: 0px;
+    padding: 0px;
+}
+
+.boneSD {
+    width: 100px;
+    height: 800px;
+    position: absolute;
+    transform-origin:center;
+    z-index: 2;
+    opacity: 1;
+    animation-fill-mode: forwards;
+}

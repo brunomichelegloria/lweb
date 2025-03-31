@@ -1,0 +1,10 @@
+@keyframes boneTest {
+    50% {scale: 4; opacity: 1;}
+    100% {scale: 1; opacity: 1;}
+    
+}
+
+@keyframes boneB-LR {
+    0% {transform: translateX(-10vw) translateY(83vh);  opacity: 1;} 
+    100% {transform: translateX(110vw) translateY(83vh);  opacity: 1;} 
+}

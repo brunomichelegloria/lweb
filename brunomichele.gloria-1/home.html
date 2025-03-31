@@ -5,7 +5,8 @@
 <head>
     <title>Notyrus</title>
 	<link rel="stylesheet" href="layout.css" type="text/css" />
-	<link rel="stylesheet" href="animations.css" type="text/css" />
+	<link rel="stylesheet" href="animationsNoty.css" type="text/css" />
+    <link rel="stylesheet" href="animationsBones.css" type="text/css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         #noty1{
@@ -29,6 +30,12 @@
                     notyrusScrollL-TB 2s 6.5s linear forwards,
                     notyrusScrollL-BT 2s 8.5s linear forwards;
         }
+        .boneBox{
+            animation: boneTest 4s linear forwards;
+        }
+        .boneSD{
+            animation: boneTest 4s linear forwards;
+        }
     </style>
 </head>
 
@@ -42,6 +49,23 @@
         <img class="notyrus" id="noty2" src="./img/notyrus.svg" />
         <img class="notyrus" id="noty3" src="./img/notyrus.svg" />
         <img class="notyrus" id="noty4" src="./img/notyrus.svg" />
+    </div>
+    <table class="boneBox">
+        <tr>
+            <td>
+                <img class="bone" src="./img/boneBumpT.svg" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img class="boneSD" src="./img/boneBody.svg" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img class="bone" src="./img/boneBumpB.svg" />
+            </td>
+        </tr>
     </div>
 </body>
 </html>
