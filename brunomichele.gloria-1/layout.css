@@ -21,35 +21,58 @@ body {
     animation-fill-mode: forwards;
 }
 
-.bone{
-    width: 100px;
-    height: 800px;
-    position: absolute;
-    transform-origin:center;
-    z-index: 2;
-    opacity: 1;
-    animation-fill-mode: forwards;
-}
-
 .boneBox {
     position: absolute;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    grid-template-rows: auto;
     margin: 0px;
     padding: 0px;
+    height: fit-content;
+    justify-content: start;
+    align-items: end;
+    width: 4vw;
 }
 
 .boneBox > * {
     margin: 0px;
     padding: 0px;
+    gap: 0px 0px;
+    align-items: center;
 }
 
-.boneSD {
-    width: 100px;
-    height: 800px;
-    position: absolute;
-    transform-origin:center;
-    z-index: 2;
-    opacity: 1;
-    animation-fill-mode: forwards;
+.boneBump {
+    height: 2vh;
+    width: auto;
+}
+
+img[src="./img/boneBumpT.svg"] {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+}
+
+img[src="./img/boneBumpB.svg"] {
+    position: relative;
+    top: -230%;
+    left: 0;
+    width: 100%;
+    height: auto;
+}
+
+.boneBody {
+    animation: boneTest 5s ease-in-out infinite;
+    height: 2.5vh;
+    width: auto;
+    transform-origin: bottom;
+    overflow: hidden;
+    position: relative;
+}
+
+.boneBody img {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    transform: scaleY(100);
 }
