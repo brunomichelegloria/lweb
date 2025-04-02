@@ -31,6 +31,7 @@ body {
     justify-content: start;
     align-items: end;
     width: 4vw;
+    transform-origin: top;
 }
 
 .boneBox > * {
@@ -61,7 +62,6 @@ img[src="./img/boneBumpB.svg"] {
 }
 
 .boneBody {
-    animation: boneTest 5s ease-in-out infinite;
     height: 2.5vh;
     width: auto;
     transform-origin: bottom;
@@ -74,5 +74,5 @@ img[src="./img/boneBumpB.svg"] {
     left: 0;
     width: 100%;
     height: auto;
-    transform: scaleY(100);
+    transform: scaleY(500);
 }

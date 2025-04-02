@@ -30,6 +30,14 @@
                     notyrusScrollL-TB 2s 6.5s linear forwards,
                     notyrusScrollL-BT 2s 8.5s linear forwards;
         }
+        #boneBox1 {
+            /* Orange    filter: invert(47%) sepia(40%) saturate(1531%) hue-rotate(1deg) brightness(107%) contrast(106%);*/
+            /* Blue      filter: invert(47%) sepia(40%) saturate(1531%) hue-rotate(180deg) brightness(107%) contrast(106%);*/
+            animation: boneL-BT 2s linear infinite;
+        }
+        #bonebody1{
+            animation: boneStretchV 2s linear infinite;
+        }
     </style>
 </head>
 
@@ -44,11 +52,11 @@
         <img class="notyrus" id="noty3" src="./img/notyrus.svg" />
         <img class="notyrus" id="noty4" src="./img/notyrus.svg" />
     </div>
-    <div class="boneBox">
+    <div class="boneBox"  id="boneBox1">
         <div class="boneBump">
                 <img src="./img/boneBumpT.svg" height="50x" width="20px" />
         </div>
-        <div class="boneBody">
+        <div class="boneBody" id="bonebody1">
                 <img src="./img/boneBody.svg" height="50px" width="20px"/>
         </div>
         <div class="boneBump">

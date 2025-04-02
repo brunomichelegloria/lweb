@@ -1,4 +1,4 @@
-@keyframes boneTest {
+@keyframes boneStretchV {
     0%, 100% {
         height: 2.5vh; /* Shorter height */
     }
@@ -9,6 +9,35 @@
 }
 
 @keyframes boneB-LR {
-    0% {transform: translateX(-10vw) translateY(83vh);  opacity: 1;} 
-    100% {transform: translateX(110vw) translateY(83vh);  opacity: 1;} 
+    0% {transform: translateX(-10vw) translateY(100vh) rotate(180deg);  opacity: 1;} 
+    100% {transform: translateX(110vw) translateY(100vh) rotate(180deg);  opacity: 1;} 
+}
+@keyframes boneB-RL {
+    0% {transform: translateX(110vw) translateY(100vh) rotate(180deg);  opacity: 1;} 
+    100% {transform: translateX(-10vw) translateY(100vh) rotate(180deg);  opacity: 1;} 
+}
+@keyframes boneT-RL {
+    0% {transform: translateX(110vw) translateY(0vh) rotate(0deg);  opacity: 1;} 
+    100% {transform: translateX(-10vw) translateY(0vh) rotate(0deg);  opacity: 1;} 
+}
+@keyframes boneT-LR {
+    0% {transform: translateX(-10vw) translateY(0vh) rotate(0deg);  opacity: 1;} 
+    100% {transform: translateX(110vw) translateY(0vh) rotate(0deg);  opacity: 1;} 
+    
+}
+@keyframes boneR-BT {
+    0% {transform: translateX(98vw) translateY(110vh) rotate(90deg);  opacity: 1;} 
+    100% {transform: translateX(98vw) translateY(-30vh) rotate(90deg); opacity: 1} 
+}
+@keyframes boneR-TB {
+    0% {transform: translateX(98vw) translateY(-30vh) rotate(90deg);  opacity: 1;} 
+    100% {transform: translateX(98vw) translateY(110vh) rotate(90deg); opacity: 1} 
+}
+@keyframes boneL-TB {
+    0% {transform: translateX(-2vw) translateY(-30vh) rotate(-90deg);  opacity: 1;} 
+    100% {transform: translateX(-2vw) translateY(110vh) rotate(-90deg); opacity: 1} 
+}
+@keyframes boneL-BT {
+    0% {transform: translateX(-2vw) translateY(110vh) rotate(-90deg);  opacity: 1;} 
+    100% {transform: translateX(-2vw) translateY(-30vh) rotate(-90deg); opacity: 1} 
 }
