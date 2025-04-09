@@ -32,6 +32,7 @@ body {
     align-items: end;
     width: 4vw;
     transform-origin: top;
+    transform: translateX(-50vh);
 }
 
 .boneBox > * {
@@ -76,3 +77,42 @@ img[src="./img/boneBumpB.svg"] {
     height: auto;
     transform: scaleY(500);
 }
+
+.menuButton  {
+    position: relative;
+    background-color: black;
+    color: white;
+    transition-duration: 0.4s;
+    font-size: xx-large;
+    padding-left: 5vw;
+    padding-right: 5vw;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+  }
+  .menuButton:hover {
+    background-color: rgb(92, 239, 114);
+  }
+
+  .menu {
+    display: flex;
+  } 
+  .retry {
+    display: none;
+  }
+
+  .menu .retry{
+    z-index: 1;
+  }
+
+  .game {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  #startGame:checked{ ~.game{display: flex; cursor: url('./img/heartPointer.svg'), auto;} ~.menu{display: none;} ~.retry{display: none;}} 
+  #gameOver:checked{ ~.game{display: none;} ~.menu{display: none;} ~.retry{display: flex;} }
