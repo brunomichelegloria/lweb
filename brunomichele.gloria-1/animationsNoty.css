@@ -1,54 +1,115 @@
 @keyframes notyrusSpawn {
-	0% {transform: translateX(0vw) translateY(100vh); opacity: 1;} 
-	45% {transform: translateX(0vw) translateY(81vh); opacity: 1;} 
-	50% {transform: translateX(0vw) translateY(82vh); opacity: 1;}
-    60% {transform: translateX(0vw) translateY(82vh); opacity: 1;}
-    100% {transform: translateX(110vw) translateY(82vh); opacity: 1;}
+	0% {transform: translateX(20vw) translateY(100vh); opacity: 1;} 
+	45% {transform: translateX(20vw) translateY(82vh); opacity: 1;} 
+	50% {transform: translateX(20vw) translateY(83vh); opacity: 1;}
+    60% {transform: translateX(20vw) translateY(83vh); opacity: 1;}
+    100% {transform: translateX(130vw) translateY(83vh); opacity: 1;}
 }
 
 @keyframes notyrusScrollB-LR {
-	0% {transform: translateX(-10vw) translateY(83vh);  opacity: 1;} 
-	100% {transform: translateX(110vw) translateY(83vh);  opacity: 1;} 
+	0% {transform: translateX(10vw) translateY(83vh);  opacity: 1;} 
+	100% {transform: translateX(130vw) translateY(83vh);  opacity: 1;} 
 }
 
 @keyframes notyrusScrollB-RL {
-    0% {transform: translateX(110vw) translateY(83vh);  opacity: 1;}
-    100% {transform: translateX(-10vw) translateY(83vh);  opacity: 1;}
+    0% {transform: translateX(130vw) translateY(83vh);  opacity: 1;}
+    100% {transform: translateX(10vw) translateY(83vh);  opacity: 1;}
 }
 
 @keyframes notyrusScrollT-LR {
-    0% {transform: translateX(-10vw) translateY(-21vh) rotate(0deg);  opacity: 1;} 
-    1% {transform: translateX(-10vw) translateY(-21vh) rotate(180deg);  opacity: 1;}
-    100% {transform: translateX(110vw) translateY(-21vh) rotate(180deg); opacity: 1}
+    0% {transform: translateX(10vw) translateY(-21vh) rotate(0deg);  opacity: 1;} 
+    1% {transform: translateX(10vw) translateY(-21vh) rotate(180deg);  opacity: 1;}
+    100% {transform: translateX(130vw) translateY(-21vh) rotate(180deg); opacity: 1}
 }
 
 @keyframes notyrusScrollT-RL {
-    0% {transform: translateX(110vw) translateY(-21vh) rotate(0deg);  opacity: 1;}
-    1% {transform: translateX(110vw) translateY(-21vh) rotate(180deg);  opacity: 1;}
-    100% {transform: translateX(-10vw) translateY(-21vh) rotate(180deg); opacity: 1}
+    0% {transform: translateX(130vw) translateY(-21vh) rotate(0deg);  opacity: 1;}
+    1% {transform: translateX(130vw) translateY(-21vh) rotate(180deg);  opacity: 1;}
+    100% {transform: translateX(10vw) translateY(-21vh) rotate(180deg); opacity: 1}
 }
 
 @keyframes notyrusScrollR-BT {
-	0% {transform: translateX(96vw) translateY(110vh) rotate(0deg);  opacity: 1;} 
-	1% {transform: translateX(96vw) translateY(110vh) rotate(-90deg);  opacity: 1;}
-	100% {transform: translateX(96vw) translateY(-30vh) rotate(-90deg); opacity: 1}
+	0% {transform: translateX(116vw) translateY(110vh) rotate(0deg);  opacity: 1;} 
+	1% {transform: translateX(116vw) translateY(110vh) rotate(-90deg);  opacity: 1;}
+	100% {transform: translateX(116vw) translateY(-30vh) rotate(-90deg); opacity: 1}
 }
 
 
 @keyframes notyrusScrollR-TB {
-    0% {transform: translateX(96vw) translateY(-30vh) rotate(0deg);  opacity: 1;} 
-    1% {transform: translateX(96vw) translateY(-30vh) rotate(-90deg);  opacity: 1;}
-    100% {transform: translateX(96vw) translateY(110vh) rotate(-90deg); opacity: 1}
+    0% {transform: translateX(116vw) translateY(-30vh) rotate(0deg);  opacity: 1;} 
+    1% {transform: translateX(116vw) translateY(-30vh) rotate(-90deg);  opacity: 1;}
+    100% {transform: translateX(116vw) translateY(110vh) rotate(-90deg); opacity: 1}
 }
 
 @keyframes notyrusScrollL-BT {
-    0% {transform: translateX(-6vw) translateY(110vh) rotate(0deg);  opacity: 1;} 
-    1% {transform: translateX(-6vw) translateY(110vh) rotate(90deg);  opacity: 1;}
-    100% {transform: translateX(-6vw) translateY(-30vh) rotate(90deg); opacity: 1}
+    0% {transform: translateX(14vw) translateY(110vh) rotate(0deg);  opacity: 1;} 
+    1% {transform: translateX(14vw) translateY(110vh) rotate(90deg);  opacity: 1;}
+    100% {transform: translateX(14vw) translateY(-30vh) rotate(90deg); opacity: 1}
 }
 
 @keyframes notyrusScrollL-TB {
-    0% {transform: translateX(-6vw) translateY(-30vh) rotate(0deg);  opacity: 1;} 
-    1% {transform: translateX(-6vw) translateY(-30vh) rotate(90deg);  opacity: 1;}
-    100% {transform: translateX(-6vw) translateY(110vh) rotate(90deg); opacity: 1}
+    0% {transform: translateX(14vw) translateY(-30vh) rotate(0deg);  opacity: 1;} 
+    1% {transform: translateX(14vw) translateY(-30vh) rotate(90deg);  opacity: 1;}
+    100% {transform: translateX(14vw) translateY(110vh) rotate(90deg); opacity: 1}
+}
+
+@keyframes notyrusThrowBL {
+    0% {transform: translateX(35vw) translateY(110vh) rotate(0deg);  opacity: 1;}
+    20% {transform: translateX(35vw) translateY(83vh) rotate(0deg);  opacity: 1;}
+    80% {transform: translateX(35vw) translateY(83vh) rotate(0deg);  opacity: 1;}
+    100% {transform: translateX(35vw) translateY(110vh) rotate(0deg); opacity: 1}
+}
+
+@keyframes notyrusThrowBR {
+    0% {transform: translateX(95vw) translateY(110vh) rotate(0deg);  opacity: 1;}
+    20% {transform: translateX(95vw) translateY(83vh) rotate(0deg);  opacity: 1;}
+    80% {transform: translateX(95vw) translateY(83vh) rotate(0deg);  opacity: 1;}
+    100% {transform: translateX(95vw) translateY(110vh) rotate(0deg); opacity: 1}
+}
+@keyframes notyrusThrowTL {
+    0% {transform: translateX(35vw) translateY(-48vh) rotate(180deg);  opacity: 1;}
+    20% {transform: translateX(35vw) translateY(-23vh) rotate(180deg);  opacity: 1;}
+    80% {transform: translateX(35vw) translateY(-23vh) rotate(180deg);  opacity: 1;}
+    100% {transform: translateX(35vw) translateY(-48vh) rotate(180deg); opacity: 1}
+}
+@keyframes notyrusThrowTR {
+    0% {transform: translateX(95vw) translateY(-48vh) rotate(180deg);  opacity: 1;}
+    20% {transform: translateX(95vw) translateY(-23vh) rotate(180deg);  opacity: 1;}
+    80% {transform: translateX(95vw) translateY(-23vh) rotate(180deg);  opacity: 1;}
+    100% {transform: translateX(95vw) translateY(-48vh) rotate(180deg); opacity: 1}
+}
+
+@keyframes notyrusDiagBL {
+    0% {transform: translateX(25vw) translateY(110vh) rotate(0deg);  opacity: 1;}
+    20% {transform: translateX(25vw) translateY(83vh) rotate(0deg);  opacity: 1;}
+    50% {transform: translateX(25vw) translateY(83vh) rotate(0deg);  opacity: 1;}
+    100% {transform: translateX(116vw) translateY(-30vh) rotate(1200deg); opacity: 1} 
+}
+@keyframes notyrusDiagBR {
+    0% {transform: translateX(95vw) translateY(110vh) rotate(0deg);  opacity: 1;}
+    20% {transform: translateX(95vw) translateY(83vh) rotate(0deg);  opacity: 1;}
+    50% {transform: translateX(95vw) translateY(83vh) rotate(0deg);  opacity: 1;}
+    100% {transform: translateX(0vw) translateY(-30vh) rotate(-1200deg); opacity: 1} 
+}
+@keyframes notyrusDiagTL {
+    0% {transform: translateX(25vw) translateY(-48vh) rotate(180deg);  opacity: 1;}
+    20% {transform: translateX(25vw) translateY(-23vh) rotate(180deg);  opacity: 1;}
+    50% {transform: translateX(25vw) translateY(-23vh) rotate(180deg);  opacity: 1;}
+    100% {transform: translateX(116vw) translateY(90vh) rotate(1200deg); opacity: 1} 
+}
+@keyframes notyrusDiagTR {
+    0% {transform: translateX(95vw) translateY(-48vh) rotate(180deg);  opacity: 1;}
+    20% {transform: translateX(95vw) translateY(-23vh) rotate(180deg);  opacity: 1;}
+    50% {transform: translateX(95vw) translateY(-23vh) rotate(180deg);  opacity: 1;}
+    100% {transform: translateX(0vw) translateY(130vh) rotate(-1200deg); opacity: 1} 
+}
+
+@keyframes notyrusDie {
+    0% {transform: translateX(-30vw) translateY(220vh) rotate(0deg) scale(20);  opacity: 1;}
+    15% {transform: translateX(20vw) translateY(250vh) rotate(0deg) scale(20);  opacity: 1;}
+    21% {transform: translateX(20vw) translateY(250vh) rotate(0deg) scale(20);  opacity: 1;}
+    45% {transform: translateX(64vw) translateY(220vh) rotate(0deg) scale(20);  opacity: 1;}
+    69% {transform: translateX(128vw) translateY(250vh) rotate(0deg) scale(20);  opacity: 1;}
+    75% {transform: translateX(128vw) translateY(250vh) rotate(0deg) scale(20);  opacity: 1;}
+    100% {transform: translateX(190vw) translateY(220vh) rotate(0deg) scale(20); opacity: 1} 
 }

@@ -1,0 +1,629 @@
+/* Inserire a 22.5 Onda */
+
+#noty1 {
+  animation: notyrusSpawn 4s 0s linear forwards,
+  notyrusScrollT-RL 2s 4.5s linear forwards,
+  notyrusScrollB-LR 2s 6.5s linear forwards,
+  notyrusScrollB-LR 2s 8.5s linear forwards,
+  notyrusScrollB-RL 2s 10.5s linear forwards,
+  notyrusThrowBL 2s 12.5s linear forwards,
+  notyrusThrowBL 2s 18.5s linear forwards,
+  notyrusDiagBL 2s 24.5s ease-out forwards;
+}
+
+#noty2 {
+  animation: notyrusScrollL-TB 2s 8.5s linear forwards,
+  notyrusScrollL-BT 2s 10.5s linear forwards,
+  notyrusThrowBR 2s 18.5s linear forwards,
+  notyrusDiagBR 2s 24.5s ease-out forwards;
+}
+
+#noty3 {
+  animation: notyrusScrollT-RL 2s 8.5s linear forwards,
+  notyrusScrollT-LR 2s 10.5s linear forwards,
+  notyrusThrowTL 2s 18.5s linear forwards,
+  notyrusDiagTL 2s 24.5s ease-out forwards;
+}
+
+#noty4 {
+  animation: notyrusScrollR-BT 2s 8.5s linear forwards,
+  notyrusScrollR-TB 2s 10.5s linear forwards,
+  notyrusThrowTR 2s 18.5s linear forwards,
+  notyrusDiagTR 2s 24.5s ease-out forwards;
+}
+
+#noty5 {
+  animation: notyrusScrollB-LR 2s 32s linear infinite;
+}
+#noty6 {
+  animation: notyrusScrollL-TB 2s 32s linear infinite;
+}
+#noty7 {
+  animation: notyrusScrollT-RL 2s 32s linear infinite;
+}
+#noty8 {
+  animation: notyrusScrollR-BT 2s 32s linear infinite;
+}
+#noty9 {
+  animation: notyrusDie 8s 38s linear forwards;
+}
+
+#boneBox1 {
+  animation: boneThrowBL 2s 12.5s linear forwards,
+  boneT-RL 2s 14.5s linear forwards,
+  boneThrowBL 2s 18.5s linear forwards,
+  boneB-RL 2s 20.5s linear forwards,
+  boneT-LR 2s 26.5s linear forwards,
+  boneL-TB 2s 32s linear infinite;
+}
+
+#boneBody1 {
+  animation: longBone 2s 12.5s linear forwards,
+  boneStretch 2s 14.5s linear forwards,
+  longBone 2s 18.5s linear forwards,
+  boneStretch 2s 20.5s linear forwards,
+  boneStretch 4s 24.5s linear forwards,
+  boneStretch 4s 30s linear infinite;
+}
+
+#boneBox2 {
+  animation: boneThrowBR 2s 18.5s linear forwards,
+  boneB-RL 2s 20.557s linear forwards,
+  boneT-LR 2s 26.557s linear forwards,
+  boneL-TB 2s 32.057s linear infinite;
+}
+
+#boneBody2 {
+  animation: longBone 2s 18.5s linear forwards,
+  boneStretch 2s 20.557s linear forwards,
+  boneStretch 4s 24.614s linear forwards,
+  boneStretch 4s 30.114s linear infinite;
+}
+
+#boneBox3 {
+  animation: boneThrowTL 2s 18.5s linear forwards,
+  boneB-RL 2s 20.614s linear forwards,
+  boneT-LR 2s 26.614s linear forwards,
+  boneL-TB 2s 32.114s linear infinite;
+}
+
+#boneBody3 {
+  animation: longBone 2s 18.5s linear forwards,
+  boneStretch 2s 20.614s linear forwards,
+  boneStretch 4s 24.728s linear forwards,
+  boneStretch 4s 30.228s linear infinite;
+}
+
+#boneBox4 {
+  animation: boneThrowTR 2s 18.5s linear forwards,
+  boneB-RL 2s 20.671s linear forwards,
+  boneT-LR 2s 26.671s linear forwards,
+  boneL-TB 2s 32.171s linear infinite;
+}
+
+#boneBody4 {
+  animation: longBone 2s 18.5s linear forwards,
+  boneStretch 2s 20.671s linear forwards,
+  boneStretch 4s 24.842s linear forwards,
+  boneStretch 4s 30.342s linear infinite;
+}
+#boneBox5 {
+  animation: boneB-RL 2s 20.728s linear forwards,
+  boneT-LR 2s 26.728s linear forwards,
+  boneL-TB 2s 32.228s linear infinite;
+}
+#boneBody5 {
+  animation: boneStretch 2s 20.728s linear forwards,
+  boneStretch 4s 24.956s linear forwards,
+  boneStretch 4s 30.457s linear infinite;
+}
+#boneBox6 {
+  animation: boneB-RL 2s 20.785s linear forwards,
+  boneT-LR 2s 26.785s linear forwards,
+  boneL-TB 2s 32.285s linear infinite;
+}
+#boneBody6 {
+  animation: boneStretch 2s 20.785s linear forwards,
+  boneStretch 4s 25.07s linear forwards, /* Da qui 24.956 si ripete invece che +0.114 */
+  boneStretch 4s 30.571s linear infinite;
+}
+#boneBox7 {
+  animation: boneB-RL 2s 20.842s linear forwards,
+  boneT-LR 2s 26.842s linear forwards,
+  boneL-TB 2s 32.342s linear infinite;
+}
+#boneBody7 {
+  animation: boneStretch 2s 20.842s linear forwards,
+  boneStretch 4s 25.184s linear forwards,
+  boneStretch 4s 30.685s linear infinite;
+}
+#boneBox8 {
+  animation: boneB-RL 2s 20.899s linear forwards,
+  boneT-LR 2s 26.899s linear forwards,
+  boneL-TB 2s 32.399s linear infinite;
+}
+#boneBody8 {
+  animation: boneStretch 2s 20.899s linear forwards,
+  boneStretch 4s 25.298s linear forwards,
+  boneStretch 4s 30.799s linear infinite;
+}
+#boneBox9 {
+  animation: boneB-RL 2s 20.956s linear forwards,
+  boneT-LR 2s 26.956s linear forwards,
+  boneL-TB 2s 32.456s linear infinite;
+}
+#boneBody9 {
+  animation: boneStretch 2s 20.956s linear forwards,
+  boneStretch 4s 25.412s linear forwards,
+  boneStretch 4s 30.914s linear infinite;
+}
+#boneBox10 {
+  animation: boneB-RL 2s 21.013s linear forwards,
+  boneT-LR 2s 27.013s linear forwards,
+  boneL-TB 2s 32.513s linear infinite;
+}
+#boneBody10 {
+  animation: boneStretch 2s 21.013s linear forwards,
+  boneStretch 4s 25.526s linear forwards,
+  boneStretch 4s 31.028s linear infinite;
+}
+#boneBox11 {
+  animation: boneB-RL 2s 21.070s linear forwards,
+  boneT-LR 2s 27.070s linear forwards,
+  boneL-TB 2s 32.570s linear infinite;
+}
+#boneBody11 {
+  animation: boneStretch 2s 21.070s linear forwards,
+  boneStretch 4s 25.64s linear forwards,
+  boneStretch 4s 31.142s linear infinite;
+}
+#boneBox12 {
+  animation: boneB-RL 2s 21.127s linear forwards,
+  boneT-LR 2s 27.127s linear forwards,
+  boneL-TB 2s 32.627s linear infinite;
+}
+#boneBody12 {
+  animation: boneStretch 2s 21.127s linear forwards,
+  boneStretch 4s 25.754s linear forwards,
+  boneStretch 4s 31.256s linear infinite;
+}
+#boneBox13 {
+  animation: boneB-RL 2s 21.184s linear forwards,
+  boneT-LR 2s 27.184s linear forwards,
+  boneL-TB 2s 32.684s linear infinite;
+}
+#boneBody13 {
+  animation: boneStretch 2s 21.184s linear forwards,
+  boneStretch 4s 25.868s linear forwards,
+  boneStretch 4s 31.370s linear infinite;
+}
+#boneBox14 {
+  animation: boneB-RL 2s 21.241s linear forwards,
+  boneT-LR 2s 27.241s linear forwards,
+  boneL-TB 2s 32.741s linear infinite;
+}
+#boneBody14 {
+  animation: boneStretch 2s 21.241s linear forwards,
+  boneStretch 4s 25.982s linear forwards,
+  boneStretch 4s 31.484s linear infinite;
+}
+#boneBox15 {
+  animation: boneB-RL 2s 21.298s linear forwards,
+  boneT-LR 2s 27.298s linear forwards,
+  boneL-TB 2s 32.798s linear infinite;
+}
+#boneBody15 {
+  animation: boneStretch 2s 21.298s linear forwards,
+  boneStretch 4s 26.096s linear forwards,
+  boneStretch 4s 31.598s linear infinite;
+}
+#boneBox16 {
+  animation: boneB-RL 2s 21.355s linear forwards,
+  boneT-LR 2s 27.355s linear forwards,
+  boneL-TB 2s 32.855s linear infinite;
+}
+#boneBody16 {
+  animation: boneStretch 2s 21.355s linear forwards,
+  boneStretch 4s 26.21s linear forwards,
+  boneStretch 4s 31.712s linear infinite;
+}
+#boneBox17 {
+  animation: boneB-RL 2s 21.412s linear forwards,
+  boneT-LR 2s 27.412s linear forwards,
+  boneL-TB 2s 32.912s linear infinite;
+}
+#boneBody17 {
+  animation: boneStretch 2s 21.412s linear forwards,
+  boneStretch 4s 26.324s linear forwards,
+  boneStretch 4s 31.828s linear infinite;
+}
+#boneBox18 {
+  animation: boneB-RL 2s 21.469s linear forwards,
+  boneT-LR 2s 27.469s linear forwards,
+  boneL-TB 2s 32.969s linear infinite;
+}
+#boneBody18 {
+  animation: boneStretch 2s 21.469s linear forwards,
+  boneStretch 4s 26.438s linear forwards,
+  boneStretch 4s 31.942s linear infinite;
+}
+#boneBox19 {
+  animation: boneB-RL 2s 21.526s linear forwards,
+  boneT-LR 2s 27.526s linear forwards,
+  boneL-TB 2s 33.026s linear infinite;
+}
+#boneBody19 {
+  animation: boneStretch 2s 21.526s linear forwards,
+  boneStretch 4s 26.552s linear forwards,
+  boneStretch 4s 32.056s linear infinite;
+}
+#boneBox20 {
+  animation: boneB-RL 2s 21.583s linear forwards,
+  boneT-LR 2s 27.583s linear forwards,
+  boneL-TB 2s 33.083s linear infinite;
+}
+#boneBody20 {
+  animation: boneStretch 2s 21.583s linear forwards,
+  boneStretch 4s 26.666s linear forwards,
+  boneStretch 4s 32.170s linear infinite;
+}
+#boneBox21 {
+  animation: boneB-RL 2s 21.640s linear forwards,
+  boneT-LR 2s 27.640s linear forwards,
+  boneL-TB 2s 33.140s linear infinite;
+}
+#boneBody21 {
+  animation: boneStretch 2s 21.640s linear forwards,
+  boneStretch 4s 26.78s linear forwards,
+  boneStretch 4s 32.284s linear infinite;
+}
+#boneBox22 {
+  animation: boneB-RL 2s 21.697s linear forwards,
+  boneT-LR 2s 27.697s linear forwards,
+  boneL-TB 2s 33.197s linear infinite;
+}
+#boneBody22 {
+  animation: boneStretch 2s 21.697s linear forwards,
+  boneStretch 4s 26.894s linear forwards,
+  boneStretch 4s 32.398s linear infinite;
+}
+#boneBox23 {
+  animation: boneB-RL 2s 21.754s linear forwards,
+  boneT-LR 2s 27.754s linear forwards,
+  boneL-TB 2s 33.254s linear infinite;
+}
+#boneBody23 {
+  animation: boneStretch 2s 21.754s linear forwards,
+  boneStretch 4s 27.008s linear forwards,
+  boneStretch 4s 32.512s linear infinite;
+}
+#boneBox24 {
+  animation: boneB-RL 2s 21.811s linear forwards,
+  boneT-LR 2s 27.811s linear forwards,
+  boneL-TB 2s 33.311s linear infinite;
+}
+#boneBody24 {
+  animation: boneStretch 2s 21.811s linear forwards,
+  boneStretch 4s 27.122s linear forwards,
+  boneStretch 4s 32.626s linear infinite;
+}
+#boneBox25 {
+  animation: boneB-RL 2s 21.868s linear forwards,
+  boneT-LR 2s 27.868s linear forwards,
+  boneL-TB 2s 33.368s linear infinite;
+}
+#boneBody25 {
+  animation: boneStretch 2s 21.868s linear forwards,
+  boneStretch 4s 27.236s linear forwards,
+  boneStretch 4s 32.740s linear infinite;
+}
+#boneBox26 {
+  animation: boneB-RL 2s 21.925s linear forwards,
+  boneT-LR 2s 27.925s linear forwards,
+  boneL-TB 2s 33.425s linear infinite;
+}
+#boneBody26 {
+  animation: boneStretch 2s 21.925s linear forwards,
+  boneStretch 4s 27.35s linear forwards,
+  boneStretch 4s 32.854s linear infinite;
+}
+#boneBox27 {
+  animation: boneB-RL 2s 21.982s linear forwards,
+  boneT-LR 2s 27.982s linear forwards,
+  boneL-TB 2s 33.482s linear infinite;
+}
+#boneBody27 {
+  animation: boneStretch 2s 21.982s linear forwards,
+  boneStretch 4s 27.464s linear forwards,
+  boneStretch 4s 32.968s linear infinite;
+}
+#boneBox28 {
+  animation: boneB-RL 2s 22.039s linear forwards,
+  boneT-LR 2s 28.039s linear forwards,
+  boneL-TB 2s 33.539s linear infinite;
+}
+#boneBody28 {
+  animation: boneStretch 2s 22.039s linear forwards,
+  boneStretch 4s 27.578s linear forwards,
+  boneStretch 4s 33.082s linear infinite;
+}
+#boneBox29 {
+  animation: boneB-RL 2s 22.096s linear forwards,
+  boneT-LR 2s 28.096s linear forwards,
+  boneL-TB 2s 33.596s linear infinite;
+}
+#boneBody29 {
+  animation: boneStretch 2s 22.096s linear forwards,
+  boneStretch 4s 27.692s linear forwards,
+  boneStretch 4s 33.196s linear infinite;
+}
+#boneBox30 {
+  animation: boneB-RL 2s 22.153s linear forwards,
+  boneT-LR 2s 28.153s linear forwards,
+  boneL-TB 2s 33.653s linear infinite;
+}
+#boneBody30 {
+  animation: boneStretch 2s 22.153s linear forwards,
+  boneStretch 4s 27.806s linear forwards,
+  boneStretch 4s 33.310s linear infinite;
+}
+#boneBox31 {
+  animation: boneB-RL 2s 22.210s linear forwards,
+  boneT-LR 2s 28.210s linear forwards,
+  boneL-TB 2s 33.710s linear infinite;
+}
+#boneBody31 {
+  animation: boneStretch 2s 22.210s linear forwards,
+  boneStretch 4s 27.92s linear forwards,
+  boneStretch 4s 33.424s linear infinite;
+}
+#boneBox32 {
+  animation: boneB-RL 2s 22.267s linear forwards,
+  boneT-LR 2s 28.267s linear forwards,
+  boneL-TB 2s 33.767s linear infinite;
+}
+#boneBody32 {
+  animation: boneStretch 2s 22.267s linear forwards,
+  boneStretch 4s 28.034s linear forwards,
+  boneStretch 4s 33.538s linear infinite;
+}
+#boneBox33 {
+  animation: boneB-RL 2s 22.324s linear forwards,
+  boneT-LR 2s 28.324s linear forwards,
+  boneL-TB 2s 33.824s linear infinite;
+}
+#boneBody33 {
+  animation: boneStretch 2s 22.324s linear forwards,
+  boneStretch 4s 28.148s linear forwards,
+  boneStretch 4s 33.652s linear infinite;
+}
+#boneBox34 {
+  animation: boneB-RL 2s 22.381s linear forwards,
+  boneT-LR 2s 28.381s linear forwards,
+  boneL-TB 2s 33.881s linear infinite;
+}
+#boneBody34 {
+  animation: boneStretch 2s 22.381s linear forwards,
+  boneStretch 4s 28.262s linear forwards,
+  boneStretch 4s 33.766s linear infinite;
+}
+#boneBox35 {
+  animation: boneB-RL 2s 22.438s linear forwards,
+  boneT-LR 2s 28.438s linear forwards,
+  boneL-TB 2s 33.938s linear infinite;
+}
+#boneBody35 {
+  animation: boneStretch 2s 22.438s linear forwards,
+  boneStretch 4s 28.376s linear forwards,
+  boneStretch 4s 33.880s linear infinite;
+}
+#boneBox36 {
+  animation: boneR-TB 2s 32s linear infinite;
+}
+#boneBody36 {
+  animation: boneStretch 4s 28s linear infinite;
+}
+#boneBox37 {
+  animation: boneR-TB 2s 32.057s linear infinite;
+}
+#boneBody37 {
+  animation: boneStretch 4s 28.114s linear infinite;
+}
+#boneBox38 {
+  animation: boneR-TB 2s 32.114s linear infinite;
+}
+#boneBody38 {
+  animation: boneStretch 4s 28.229s linear infinite;
+}
+#boneBox39 {
+  animation: boneR-TB 2s 32.171s linear infinite;
+}
+#boneBody39 {
+  animation: boneStretch 4s 28.343s linear infinite;
+}
+#boneBox40 {
+  animation: boneR-TB 2s 32.228s linear infinite;
+}
+#boneBody40 {
+  animation: boneStretch 4s 28.458s linear infinite;
+}
+#boneBox41 {
+  animation: boneR-TB 2s 32.285s linear infinite;
+}
+#boneBody41 {
+  animation: boneStretch 4s 28.572s linear infinite;
+}
+#boneBox42 {
+  animation: boneR-TB 2s 32.342s linear infinite;
+}
+#boneBody42 {
+  animation: boneStretch 4s 28.686s linear infinite;
+}
+#boneBox43 {
+  animation: boneR-TB 2s 32.399s linear infinite;
+}
+#boneBody43 {
+  animation: boneStretch 4s 28.801s linear infinite;
+}
+#boneBox44 {
+  animation: boneR-TB 2s 32.456s linear infinite;
+}
+#boneBody44 {
+  animation: boneStretch 4s 28.915s linear infinite;
+}
+#boneBox45 {
+  animation: boneR-TB 2s 32.513s linear infinite;
+}
+#boneBody45 {
+  animation: boneStretch 4s 29.029s linear infinite;
+}
+#boneBox46 {
+  animation: boneR-TB 2s 32.57s linear infinite;
+}
+#boneBody46 {
+  animation: boneStretch 4s 29.143s linear infinite;
+}
+#boneBox47 {
+  animation: boneR-TB 2s 32.627s linear infinite;
+}
+#boneBody47 {
+  animation: boneStretch 4s 29.258s linear infinite;
+}
+#boneBox48 {
+  animation: boneR-TB 2s 32.684s linear infinite;
+}
+#boneBody48 {
+  animation: boneStretch 4s 29.372s linear infinite;
+}
+#boneBox49 {
+  animation: boneR-TB 2s 32.741s linear infinite;
+}
+#boneBody49 {
+  animation: boneStretch 4s 29.486s linear infinite;
+}
+#boneBox50 {
+  animation: boneR-TB 2s 32.798s linear infinite;
+}
+#boneBody50 {
+  animation: boneStretch 4s 29.601s linear infinite;
+}
+#boneBox51 {
+  animation: boneR-TB 2s 32.855s linear infinite;
+}
+#boneBody51 {
+  animation: boneStretch 4s 29.715s linear infinite;
+}
+#boneBox52 {
+  animation: boneR-TB 2s 32.912s linear infinite;
+}
+#boneBody52 {
+  animation: boneStretch 4s 29.829s linear infinite;
+}
+#boneBox53 {
+  animation: boneR-TB 2s 32.969s linear infinite;
+}
+#boneBody53 {
+  animation: boneStretch 4s 29.943s linear infinite;
+}
+#boneBox54 {
+  animation: boneR-TB 2s 33.026s linear infinite;
+}
+#boneBody54 {
+  animation: boneStretch 4s 30.057s linear infinite;
+}
+#boneBox55 {
+  animation: boneR-TB 2s 33.083s linear infinite;
+}
+#boneBody55 {
+  animation: boneStretch 4s 30.171s linear infinite;
+}
+#boneBox56 {
+  animation: boneR-TB 2s 33.14s linear infinite;
+}
+#boneBody56 {
+  animation: boneStretch 4s 30.285s linear infinite;
+}
+#boneBox57 {
+  animation: boneR-TB 2s 33.197s linear infinite;
+}
+#boneBody57 {
+  animation: boneStretch 4s 30.399s linear infinite;
+}
+#boneBox58 {
+  animation: boneR-TB 2s 33.254s linear infinite;
+}
+#boneBody58 {
+  animation: boneStretch 4s 30.514s linear infinite;
+}
+#boneBox59 {
+  animation: boneR-TB 2s 33.311s linear infinite;
+}
+#boneBody59 {
+  animation: boneStretch 4s 30.628s linear infinite;
+}
+#boneBox60 {
+  animation: boneR-TB 2s 33.368s linear infinite;
+}
+#boneBody60 {
+  animation: boneStretch 4s 30.742s linear infinite;
+}
+#boneBox61 {
+  animation: boneR-TB 2s 33.425s linear infinite;
+}
+#boneBody61 {
+  animation: boneStretch 4s 30.857s linear infinite;
+}
+#boneBox62 {
+  animation: boneR-TB 2s 33.482s linear infinite;
+}
+#boneBody62 {
+  animation: boneStretch 4s 30.971s linear infinite;
+}
+#boneBox63 {
+  animation: boneR-TB 2s 33.539s linear infinite;
+}
+#boneBody63 {
+  animation: boneStretch 4s 31.085s linear infinite;
+}
+#boneBox64 {
+  animation: boneR-TB 2s 33.596s linear infinite;
+}
+#boneBody64 {
+  animation: boneStretch 4s 31.199s linear infinite;
+}
+#boneBox65 {
+  animation: boneR-TB 2s 33.653s linear infinite;
+}
+#boneBody65 {
+  animation: boneStretch 4s 31.314s linear infinite;
+}
+#boneBox66 {
+  animation: boneR-TB 2s 33.71s linear infinite;
+}
+#boneBody66 {
+  animation: boneStretch 4s 31.428s linear infinite;
+}
+#boneBox67 {
+  animation: boneR-TB 2s 33.767s linear infinite;
+}
+#boneBody67 {
+  animation: boneStretch 4s 31.542s linear infinite;
+}
+#boneBox68 {
+  animation: boneR-TB 2s 33.824s linear infinite;
+}
+#boneBody68 {
+  animation: boneStretch 4s 31.657s linear infinite;
+}
+#boneBox69 {
+  animation: boneR-TB 2s 33.881s linear infinite;
+}
+#boneBody69 {
+  animation: boneStretch 4s 31.771s linear infinite;
+}
+#boneBox70 {
+  animation: boneR-TB 2s 33.938s linear infinite;
+}
+#boneBody70 {
+  animation: boneStretch 4s 31.885s linear infinite;
+}

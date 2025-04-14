@@ -7,243 +7,8 @@
 	<link rel="stylesheet" href="layout.css" type="text/css" />
 	<link rel="stylesheet" href="animationsNoty.css" type="text/css" />
     <link rel="stylesheet" href="animationsBones.css" type="text/css" />
+    <link rel="stylesheet" href="timeStamps.css" type="text/css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-       * {
-        #noty1{
-            animation:notyrusSpawn 4s linear forwards,
-                    notyrusScrollT-RL 2s 4.5s linear forwards,
-                    notyrusScrollB-LR 2s 6.5s linear forwards,
-                    notyrusScrollB-RL 2s 8.5s linear forwards;
-        }
-        #noty2{
-            animation:notyrusSpawn 4s linear forwards,
-                    notyrusScrollR-BT 2s 6.5s linear forwards,
-                    notyrusScrollR-TB 2s 8.5s linear forwards;
-        }
-        #noty3{
-            animation:notyrusSpawn 4s linear forwards,
-                    notyrusScrollT-RL 2s 6.5s linear forwards,
-                    notyrusScrollT-LR 2s 8.5s linear forwards;
-        }
-        #noty4{
-            animation:notyrusSpawn 4s linear forwards,
-                    notyrusScrollL-TB 2s 6.5s linear forwards,
-                    notyrusScrollL-BT 2s 8.5s linear forwards;
-        }
-        #boneBox1 {
-            /* Orange    filter: invert(47%) sepia(40%) saturate(1531%) hue-rotate(1deg) brightness(107%) contrast(106%);*/
-            /* Blue      filter: invert(47%) sepia(40%) saturate(1531%) hue-rotate(180deg) brightness(107%) contrast(106%);*/
-            animation: boneB-RL 2s linear forwards;
-        }
-        #boneBox2 {
-            animation: boneB-RL 2s 0.057s linear forwards;
-        }
-        #boneBox3 {
-            animation: boneB-RL 2s 0.114s linear forwards;
-        }
-        #boneBox4 {
-            animation: boneB-RL 2s 0.171s linear forwards;
-        }
-        #boneBox5 {
-            animation: boneB-RL 2s 0.228s linear forwards;
-        }
-        #boneBox6 {
-            animation: boneB-RL 2s 0.285s linear forwards;
-        }
-        #boneBox7 {
-            animation: boneB-RL 2s 0.342s linear forwards;
-        }
-        #boneBox8 {
-            animation: boneB-RL 2s 0.399s linear forwards;
-        }
-        #boneBox9 {
-            animation: boneB-RL 2s 0.456s linear forwards;
-        }
-        #boneBox10 {
-            animation: boneB-RL 2s 0.513s linear forwards;
-        }
-        #boneBox11 {
-            animation: boneB-RL 2s 0.57s linear forwards;
-        }
-        #boneBox12 {
-            animation: boneB-RL 2s 0.627s linear forwards;
-        }
-        #boneBox13 {
-            animation: boneB-RL 2s 0.684s linear forwards;
-        }
-        #boneBox14 {
-            animation: boneB-RL 2s 0.741s linear forwards;
-        }
-        #boneBox15 {
-            animation: boneB-RL 2s 0.798s linear forwards;
-        }
-        #boneBox16 {
-            animation: boneB-RL 2s 0.855s linear forwards;
-        }
-        #boneBox17 {
-            animation: boneB-RL 2s 0.912s linear forwards;
-        }
-        #boneBox18 {
-            animation: boneB-RL 2s 0.969s linear forwards;
-        }
-        #boneBox19 {
-            animation: boneB-RL 2s 1.026s linear forwards;
-        }
-        #boneBox20 {
-            animation: boneB-RL 2s 1.083s linear forwards;
-        }
-        #boneBox21 {
-            animation: boneB-RL 2s 1.14s linear forwards;
-        }
-        #boneBox22 {
-            animation: boneB-RL 2s 1.197s linear forwards;
-        }
-        #boneBox23 {
-            animation: boneB-RL 2s 1.254s linear forwards;
-        }
-        #boneBox24 {
-            animation: boneB-RL 2s 1.311s linear forwards;
-        }
-        #boneBox25 {
-            animation: boneB-RL 2s 1.368s linear forwards;
-        }
-        #boneBox26 {
-            animation: boneB-RL 2s 1.425s linear forwards;
-        }
-        #boneBox27 {
-            animation: boneB-RL 2s 1.482s linear forwards;
-        }
-        #boneBox28 {
-            animation: boneB-RL 2s 1.539s linear forwards;
-        }
-        #boneBox29 {
-            animation: boneB-RL 2s 1.596s linear forwards;
-        }
-        #boneBox30 {
-            animation: boneB-RL 2s 1.653s linear forwards;
-        }
-        #boneBox31 {
-            animation: boneB-RL 2s 1.71s linear forwards;
-        }
-        #boneBox32 {
-            animation: boneB-RL 2s 1.767s linear forwards;
-        }
-        #boneBox33 {
-            animation: boneB-RL 2s 1.824s linear forwards;
-        }
-        #boneBox34 {
-            animation: boneB-RL 2s 1.881s linear forwards;
-        }
-        #boneBox35 {
-            animation: boneB-RL 2s 1.938s linear forwards;
-        }
-        #boneBody1{
-            animation: boneStretchV 2s linear forwards;
-        }
-        #boneBody2{
-            animation: boneStretchV 2s 0.057s linear forwards;
-        }
-        #boneBody3{
-            animation: boneStretchV 2s 0.114s linear forwards;
-        }
-        #boneBody4{
-            animation: boneStretchV 2s 0.171s linear forwards;
-        }
-        #boneBody5{
-            animation: boneStretchV 2s 0.228s linear forwards;
-        }
-        #boneBody6{
-            animation: boneStretchV 2s 0.285s linear forwards;
-        }
-        #boneBody7{
-            animation: boneStretchV 2s 0.342s linear forwards;
-        }
-        #boneBody8{
-            animation: boneStretchV 2s 0.399s linear forwards;
-        }
-        #boneBody9{
-            animation: boneStretchV 2s 0.456s linear forwards;
-        }
-        #boneBody10{
-            animation: boneStretchV 2s 0.513s linear forwards;
-        }
-        #boneBody11{
-            animation: boneStretchV 2s 0.57s linear forwards;
-        }
-        #boneBody12{
-            animation: boneStretchV 2s 0.627s linear forwards;
-        }
-        #boneBody13{
-            animation: boneStretchV 2s 0.684s linear forwards;
-        }
-        #boneBody14{
-            animation: boneStretchV 2s 0.741s linear forwards;
-        }
-        #boneBody15{
-            animation: boneStretchV 2s 0.798s linear forwards;
-        }
-        #boneBody16{
-            animation: boneStretchV 2s 0.855s linear forwards;
-        }
-        #boneBody17{
-            animation: boneStretchV 2s 0.912s linear forwards;
-        }
-        #boneBody18{
-            animation: boneStretchV 2s 0.969s linear forwards;
-        }
-        #boneBody19{
-            animation: boneStretchV 2s 1.026s linear forwards;
-        }
-        #boneBody20{
-            animation: boneStretchV 2s 1.083s linear forwards;
-        }
-        #boneBody21{
-            animation: boneStretchV 2s 1.14s linear forwards;
-        }
-        #boneBody22{
-            animation: boneStretchV 2s 1.197s linear forwards;
-        }
-        #boneBody23{
-            animation: boneStretchV 2s 1.254s linear forwards;
-        }
-        #boneBody24{
-            animation: boneStretchV 2s 1.311s linear forwards;
-        }
-        #boneBody25{
-            animation: boneStretchV 2s 1.368s linear forwards;
-        }
-        #boneBody26{
-            animation: boneStretchV 2s 1.425s linear forwards;
-        }
-        #boneBody27{
-            animation: boneStretchV 2s 1.482s linear forwards;
-        }
-        #boneBody28{
-            animation: boneStretchV 2s 1.539s linear forwards;
-        }
-        #boneBody29{
-            animation: boneStretchV 2s 1.596s linear forwards;
-        }
-        #boneBody30{
-            animation: boneStretchV 2s 1.653s linear forwards;
-        }
-        #boneBody31{
-            animation: boneStretchV 2s 1.71s linear forwards;
-        }
-        #boneBody32{
-            animation: boneStretchV 2s 1.767s linear forwards;
-        }
-        #boneBody33{
-            animation: boneStretchV 2s 1.824s linear forwards;
-        }
-        #boneBody34{
-            animation: boneStretchV 2s 1.881s linear forwards;
-        }
-        #boneBody35{
-            animation: boneStretchV 2s 1.938s linear forwards;
-        } }
-    </style>
 </head>
 
 <body>
@@ -257,7 +22,7 @@
     </section>
 
     <section class="game">
-        <audio autoplay>
+        <audio>
 	    	<source src="./music/Spider_Dance.mp3" />
 	    	Audio not working properly.
 	    </audio>
@@ -268,6 +33,13 @@
         <img class="notyrus" id="noty3" src="./img/notyrus.svg" />
         <img class="notyrus" id="noty4" src="./img/notyrus.svg" />
     </div> 
+    <div class="notyrusBox" style="z-index: 3;">
+        <img class="notyrus" id="noty5" src="./img/notyrus.svg" />
+        <img class="notyrus" id="noty6" src="./img/notyrus.svg" />
+        <img class="notyrus" id="noty7" src="./img/notyrus.svg" />
+        <img class="notyrus" id="noty8" src="./img/notyrus.svg" />
+        <img class="notyrus" id="noty9" src="./img/notyrus.svg" /> 
+    </div>
     <div class="boneBox"  id="boneBox1">
         <div class="boneBump">
                 <img src="./img/boneBumpT.svg" height="50x" width="20px"/>
@@ -653,6 +425,391 @@
                 <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
         </div>
     </div> 
+    <div class="boneBox" id="boneBox36">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody36">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox37">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody37">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox38">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody38">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox39">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody39">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox40">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody40">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox41">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody41">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox42">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody42">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox43">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody43">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox44">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody44">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox45">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody45">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox46">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody46">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox47">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody47">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox48">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody48">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox49">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody49">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox50">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody50">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox51">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody51">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox52">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody52">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox53">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody53">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox54">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody54">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox55">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody55">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox56">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody56">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox57">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody57">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox58">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody58">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox59">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody59">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox60">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody60">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox61">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody61">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox62">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody62">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox63">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody63">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox64">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody64">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox65">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody65">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox66">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody66">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox67">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody67">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox68">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody68">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox69">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody69">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
+    <div class="boneBox" id="boneBox70">
+        <div class="boneBump">
+                <img src="./img/boneBumpT.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBody" id="boneBody70">
+                <img src="./img/boneBody.svg" height="50px" width="20px"/>
+        </div>
+        <div class="boneBump">
+                <img src="./img/boneBumpB.svg" height="50px" width="20px"/>
+        </div>
+    </div>
         </div>
     </section>
 
