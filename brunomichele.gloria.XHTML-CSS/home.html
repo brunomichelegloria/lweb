@@ -4,8 +4,8 @@
 
 <head>
     <title>Notyrus</title>
-	<link rel="stylesheet" href="layout.css" type="text/css" />
-	<link rel="stylesheet" href="animationsNoty.css" type="text/css" />
+    <link rel="stylesheet" href="layout.css" type="text/css" />
+    <link rel="stylesheet" href="animationsNoty.css" type="text/css" />
     <link rel="stylesheet" href="animationsBones.css" type="text/css" />
     <link rel="stylesheet" href="timeStamps.css" type="text/css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,18 +14,18 @@
 <body>
     <input type="checkbox" id="startGame" hidden>
     <input type="checkbox" id="gameOver"  hidden>
-    <section class="menu">
+    <div class="menu">
       <label for="startGame" class="menuButton" style="top: 40vh; left: 41vw;">Start Game</label>
-    </section>
-    <section class="retry">
+    </div>
+    <div class="retry">
         <label for="startGame" class="menuButton" style="top: 40vh; left: 41vw;" onclick="resetGame()">Try Again!</label>
-    </section>
+    </div>
 
-    <section class="game">
+    <div class="game">
         <audio>
 	    	<source src="./music/Spider_Dance.mp3" />
 	    	Audio not working properly.
-	    </audio>
+	</audio>
         <div>
     <div class="notyrusBox">
         <img class="notyrus" id="noty1" src="./img/notyrus.svg" />
@@ -811,7 +811,7 @@
         </div>
     </div>
         </div>
-    </section>
+    </div>
 
     <script>
         // Ensure the event listener is added after the page loads
