@@ -2,9 +2,8 @@
 // Connessione al database
 $host = '127.0.0.1';
 $user = 'siteuser';
-$password = 'bellapw'; // o la password se ne hai impostata una
+$password = 'bellapw'; 
 
-//$user = 'adminStabilimento'; $password = 'adminpassword';
 $database = 'stabilimento';
 
 $conn = new mysqli($host, $user, $password, $database);
