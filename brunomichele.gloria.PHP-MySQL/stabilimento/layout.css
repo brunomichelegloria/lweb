@@ -1,0 +1,26 @@
+body {
+	background: BurlyWood;
+	font-family: sans-serif;
+	padding: 20px; 
+}
+
+.griglia { 
+	display: inline-block;
+	border: 1px solid #ccc;
+}
+
+.riga {
+	display: flex;
+}
+
+.cella {
+    width: 40px; height: 40px; margin: 2px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid #ddd; font-size: 20px;
+}
+
+.sabbia { background-color: #f5deb3; }  /* sabbia */
+.prato  { background-color: #b6f5b3; }  /* prato */
+.vuoto  { background-color: #eee; }     /* posizione senza ombrellone */
+.libero { background-color: #7fff7f; }  /* ombrellone libero */
+.occupato { background-color: #ff7f7f; }/* ombrellone occupato */
