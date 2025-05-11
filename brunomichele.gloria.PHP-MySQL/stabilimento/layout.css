@@ -1,26 +1,45 @@
 body {
+	display: flex;
 	background: BurlyWood;
+	position: absolute;
+	height: 100vh;
+	width: 100vw;
 	font-family: sans-serif;
-	padding: 20px; 
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	margin-top: 2vh;
+	margin-bottom: 3vh;
+	padding: 1vh;
 }
 
 .griglia { 
-	display: inline-block;
+	display: grid;
+	width: 4vw;
+	height: 4vh;
 	border: 1px solid #ccc;
-}
-
-.riga {
-	display: flex;
+	transform: translateY(10vh) rotate(90deg);
+	transform-origin: center;
+	justify-content: space-around;
+	align-content: center;
 }
 
 .cella {
-    width: 40px; height: 40px; margin: 2px;
-    display: flex; align-items: center; justify-content: center;
-    border: 1px solid #ddd; font-size: 20px;
+	width: 4vh;
+	height: 4vw;
+    border: 1px solid #ddd;
+	margin-left: 2vh;
+	margin-right: 2vh;
+	transform: rotate(-90deg);
 }
+
+svg {
+	width: 4vh;
+	height: 4vw;
+}
+
+svg.libero path { fill: red;}
+svg.occupato path { fill: rgb(145, 197, 66);}
 
 .sabbia { background-color: #f5deb3; }  /* sabbia */
 .prato  { background-color: #b6f5b3; }  /* prato */
-.vuoto  { background-color: #eee; }     /* posizione senza ombrellone */
-.libero { background-color: #7fff7f; }  /* ombrellone libero */
-.occupato { background-color: #ff7f7f; }/* ombrellone occupato */
