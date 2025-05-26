@@ -1,12 +1,8 @@
 <?php
 // Connessione al database
 $host = '127.0.0.1';
-$user = 'siteuser';
-$password = 'bellapw'; 
 
-$database = 'stabilimento';
-
-$conn = new mysqli($host, $user, $password, $database);
+$conn = new mysqli($host, 'siteuser', 'bellapw', 'stabilimento');
 
 // Verifica connessione
 if ($conn->connect_error) {
@@ -41,6 +37,33 @@ $conn->close();
 </head>
 <body>
     <h1>Griglia Ombrelloni</h1>
+    <img src="./img/beach-umbrella.svg" alt="Login" id="loginIcon">
+    <div id="loginBox">
+        <form method="POST" action="login.php">
+            <label for="userName">Username:</label>
+            <input type="text" name="userName" required>
+            <label for="password">Password:</label>
+            <input type="password" name="password" required>
+            <button type="submit" name="invio">Login</button>
+        </form>
+    </div>
+
+    <script>
+        const icon = document.getElementById('loginIcon');
+        const box = document.getElementById('loginBox');
+
+        icon.addEventListener('click', (event) => {
+            event.stopPropagation();
+            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!box.contains(event.target)) {
+                box.style.display = 'none';
+            }
+        });
+    </script>
+    
     <div class="griglia" style="grid-template-columns: repeat(<?php echo count($griglia[0]); ?>, 1fr); grid-template-rows: repeat(<?php echo count($griglia); ?>, 1fr);">
         <?php foreach ($griglia as $riga): ?>
             <div class="riga">

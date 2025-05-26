@@ -43,3 +43,37 @@ svg.occupato path { fill: rgb(145, 197, 66);}
 
 .sabbia { background-color: #f5deb3; }  /* sabbia */
 .prato  { background-color: #b6f5b3; }  /* prato */
+
+#loginIcon {
+	position: absolute;
+	top: 1vh;
+	right: 5vw;
+	width: 4vw;
+	height: 4vh;
+}
+
+#loginBox {
+	position: absolute;
+	top: 1vh;
+	right: 5vw;
+	background-color: rgb(173, 147, 113);
+	padding: 2vh;
+	border: 0.5vh solid rgb(173, 138, 93);
+	border-radius: 0.5vh;
+	display: none;
+	z-index: 1000;
+}
+
+#loginBox label {
+	display: block;
+	margin-top: 1vh;
+}
+
+#loginBox input {
+	width: 100%;
+	margin-top: 0.3vh;
+}
+
+#loginBox button {
+	margin-top: 1vh;
+}
