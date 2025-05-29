@@ -36,7 +36,9 @@ $conn->close();
 	<link rel="stylesheet" href="layout.css" type="text/css" />
 </head>
 <body>
-    <h1>Griglia Ombrelloni</h1>
+    <div id="wave1"></div>
+    <div id="wave2"></div>
+    <div id="wave3"></div>
     <img src="./img/beach-umbrella.svg" alt="Login" id="loginIcon">
     <div id="loginBox">
         <form method="POST" action="login.php">

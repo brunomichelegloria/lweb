@@ -42,7 +42,8 @@ $conn->close();
 	<link rel="stylesheet" href="layoutAdmin.css" type="text/css" />
 </head>
 <body>
-    <h1>Griglia Ombrelloni</h1>
+    <h1>Lido Marcello</h1>
+    <p style="margin: 0; padding: 0;">Dove si fa macello</p>
     <a href="logout.php">
         <img src="./img/arrow-sm-left-svgrepo-com.svg" alt="Login" id="backIcon">
     </a>
@@ -74,7 +75,10 @@ $conn->close();
                         $icona = '';
                     }
                 ?>
-                <div class="<?= implode(' ', $classi) ?>"><?= $icona ?></div>
+                <div class="<?= implode(' ', $classi) ?>">
+                    <?= $icona ?>
+                    <span class="coordinate">&#40;<?= $cella['x'] ?>,<?= $cella['y'] ?>&#41;</span>
+                </div>
                 <?php endforeach ?>
             </div>
         <?php endforeach ?>
