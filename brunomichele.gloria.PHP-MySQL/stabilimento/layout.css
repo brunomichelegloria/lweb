@@ -79,8 +79,8 @@ svg {
 	100% { background-position: 540vw 0; }
 }
 
-svg.libero path { fill: red;}
-svg.occupato path { fill: green;}
+svg.occupato path { fill: red;}
+svg.libero path { fill: green;}
 
 .sabbia { background-color: transparent; }
 .prato  {

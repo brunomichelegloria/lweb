@@ -31,7 +31,6 @@ body {
 	margin-left: 2vh;
 	margin-right: 2vh;
 	transform: rotate(-90deg);
-    align-items: top;
     justify-content: center;
 }
 
@@ -45,8 +44,8 @@ svg {
 	height: 4vw;
 }
 
-svg.libero path { fill: red;}
-svg.occupato path { fill: rgb(145, 197, 66);}
+svg.occupato path { fill: red;}
+svg.libero path { fill: rgb(145, 197, 66);}
 
 .sabbia { background-color: #f5deb3; }  /* sabbia */
 .prato  { background-color: #b6f5b3; }  /* prato */

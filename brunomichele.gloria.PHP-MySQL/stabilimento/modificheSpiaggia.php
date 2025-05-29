@@ -8,7 +8,7 @@ if (!isset($_SESSION['accessoPermesso']) || $_SESSION['accessoPermesso'] !== tru
 
 // Connessione al database
 require_once __DIR__ . '/loginAdmin.php';
-$conn = new mysqli($DB_ADMIN_HOST, $DB_ADMIN_USER, $DB_ADMIN_PASS, $DB_ADMIN_NAME);
+$conn = new mysqli($DB_ADMIN_HOST, $DB_ADMIN_USER, $DB_ADMIN_PASS, $DB_NAME);
 if ($conn->connect_error) {
     die("Connessione fallita: " . $conn->connect_error);
 }
@@ -73,7 +73,7 @@ $conn->close();
                         $icona = '';
                     }
                 ?>
-                <div class="<?= implode(' ', $classi) ?>">
+                <div class="<?= implode(' ', $classi) ?>" onclick="toggleOmbrellone(this, <?= $cella['x'] ?>, <?= $cella['y'] ?>)">
                     <?= $icona ?>
                     <span class="coordinate">&#40;<?= $cella['x'] ?>,<?= $cella['y'] ?>&#41;</span>
                 </div>
@@ -81,6 +81,43 @@ $conn->close();
             </div>
         <?php endforeach ?>
     </div>
+
+    <script>
+        function toggleOmbrellone(element, x, y) {
+
+            fetch('toggleOmbrellone.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `x=${x}&y=${y}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const svg = element.querySelector('svg');
+                    if (data.newState === 0) {
+                        element.classList.remove('libero');
+                        element.classList.add('occupato');
+                        if (svg) {
+                            vg.classList.remove('libero');
+                            svg.classList.add('occupato');
+                        }
+                    } else {
+                        element.classList.remove('occupato');
+                        element.classList.add('libero');
+                        if (svg) {
+                            svg.classList.remove('occupato');
+                            svg.classList.add('libero');
+                    }
+                }
+                } else {
+                    alert("Errore: " + data.message);
+                }
+            })
+            .catch(error => console.error('Errore nella richiesta:', error));
+        }
+    </script>
 </body>
 </html>
 
