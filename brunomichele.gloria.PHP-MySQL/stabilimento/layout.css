@@ -15,20 +15,19 @@ body {
 
 .griglia { 
 	display: grid;
-	width: 4vw;
-	height: 30vh;
-	transform: translateY(10vh) rotate(90deg);
-	transform-origin: center;
-	justify-content: space-around;
-	align-content: center;
+	width: 80vw;
+	height: auto;
+	justify-content: center;
+	margin-top: 20vh;
 }
 
 .cella {
 	width: 6vh;
 	height: 4vw;
-	margin-left: 2vh;
-	margin-right: 2vh;
-	transform: rotate(-90deg);
+	margin-top: 2vh;
+	margin-bottom: 2vh;
+	justify-content: center;
+	gap: 1vw;
 }
 
 svg {
@@ -127,4 +126,11 @@ svg.libero path { fill: green;}
 
 #loginBox button {
 	margin-top: 1vh;
+}
+
+.tropicana {
+	width: 50vw;
+	height: auto;
+	margin-bottom: 0;
+	margin-top: 15vh;
 }
