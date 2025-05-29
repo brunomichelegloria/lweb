@@ -5,12 +5,10 @@ if (!isset($_SESSION['accessoPermesso']) || $_SESSION['accessoPermesso'] !== tru
     header('Location: ../../brunomichele.gloria.XHTML-CSS/home.html');
     exit();
 }
+
 // Connessione al database
-$host = '127.0.0.1';
-
-$conn = new mysqli($host, 'siteuser', 'bellapw', 'stabilimento');
-
-// Verifica connessione
+require_once __DIR__ . '/loginAdmin.php';
+$conn = new mysqli($DB_ADMIN_HOST, $DB_ADMIN_USER, $DB_ADMIN_PASS, $DB_ADMIN_NAME);
 if ($conn->connect_error) {
     die("Connessione fallita: " . $conn->connect_error);
 }
