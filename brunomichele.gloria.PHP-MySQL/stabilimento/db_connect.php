@@ -23,12 +23,7 @@ function getDbConnection($ruolo = 'pubblico') {
         die("Ruolo '$ruolo' non valido.");
     }
 
-    $conn = new mysqli(
-        $dbHost,
-        $utenti[$ruolo]['user'],
-        $utenti[$ruolo]['pass'],
-        $dbName
-    );
+    $conn = new mysqli($dbHost, $utenti[$ruolo]['user'], $utenti[$ruolo]['pass'], $dbName);
 
     if ($conn->connect_error) {
         die("Errore connessione DB: " . $conn->connect_error);

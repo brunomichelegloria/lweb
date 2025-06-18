@@ -4,10 +4,9 @@ ini_set('display_errors', 1);
 ?>
 
 <?php
-require_once 'db_connect.php';
+require_once './db_connect.php';
 $conn = getDbConnection(); //Utente pubblico
 
-// Recupera le posizioni e lo stato degli ombrelloni
 $sql = "SELECT
     p.x,
     p.y,
@@ -52,29 +51,72 @@ $conn->close();
     <div id="wave1"></div>
     <div id="wave2"></div>
     <div id="wave3"></div>
-    <img src="./img/beach-umbrella.svg" alt="Login" id="loginIcon">
-    <div id="loginBox">
-        <form method="POST" action="login.php">
-            <label for="userName">Username:</label>
-            <input type="text" name="userName" required>
-            <label for="password">Password:</label>
-            <input type="password" name="password" required>
-            <button type="submit" name="invio">Login</button>
-        </form>
+    <div id="adminLoginBox">
+        <img src="./img/beach-umbrella.svg" alt="Login" id="adminLoginIcon">
+        <div id="adminLogin">
+            <h2 style="margin-top:0;">Login Amministratore</h2>
+            <form method="POST" action="login.php">
+                <label for="username">Username:</label>
+                <input type="text" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" name="password" required>
+                <button type="submit" name="invio">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="userLoginBox">
+        <img src="./img/life-belt.png" alt="Login Utente" id="userLoginIcon">
+        <div id="userLogin">
+            <h2 style="margin-top:0;">Login Utente</h2>
+            <form method="POST" action="login.php">
+                <label for="username">Username:</label>
+                <input type="text" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" name="password" required>
+                <button type="submit" name="invio">Login</button>
+            </form>
+        </div>
     </div>
 
     <script>
-        const icon = document.getElementById('loginIcon');
-        const box = document.getElementById('loginBox');
+        const adminIcon = document.getElementById('adminLoginIcon');
+        const adminLog = document.getElementById('adminLogin');
 
-        icon.addEventListener('click', (event) => {
+        adminIcon.addEventListener('click', (event) => {
             event.stopPropagation();
-            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+            adminLog.style.display = (adminLog.style.display === 'block') ? 'none' : 'block';
         });
 
         document.addEventListener('click', (event) => {
-            if (!box.contains(event.target)) {
-                box.style.display = 'none';
+            if (!adminLog.contains(event.target)) {
+                adminLog.style.display = 'none';
+            }
+        });
+
+        const userIcon = document.getElementById('userLoginIcon');
+        const userLog = document.getElementById('userLogin');
+
+        userIcon.addEventListener('click', (event) => {
+            event.stopPropagation();
+            userIcon.classList.add('animating');
+
+            setTimeout(() => {
+                userLog.style.display = 'block';
+                userLog.classList.add('appearing'); //Da fare senza timout
+            }, 400);
+            setTimeout(() => {
+                userIcon.classList.remove('animating');
+            }, 900);
+
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!userLog.contains(event.target) && !userIcon.contains(event.target)) {
+                userLog.classList.remove('appearing');
+                setTimeout(() => {
+                    userLog.style.display = 'none';
+                }, 500);
             }
         });
     </script>

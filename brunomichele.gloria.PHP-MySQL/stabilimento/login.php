@@ -1,44 +1,69 @@
 <?php
 session_start();
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+require 'db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-    if (empty($_POST['userName']) || empty($_POST['password'])) {
-        echo "<p>Accesso Negato!</p>";
-    } else {
-        $conn = new mysqli('127.0.0.1', 'siteuser', 'bellapw', 'stabilimento');
-        if ($conn->connect_error) {
-            die("Connessione fallita: " . $conn->connect_error);
-        }
+    $conn = getDbConnection('admin');
 
-        //SQL injection
-        $stmt = $conn->prepare("SELECT password FROM utenti WHERE username = ?");
-        $stmt->bind_param("s", $_POST['userName']);
+    if (filter_var($username, FILTER_VALIDATE_EMAIL)) {
+        $stmt = $conn->prepare("SELECT id, password, nome FROM Cliente WHERE email = ?");
+        $stmt->bind_param("s", $username);
         $stmt->execute();
         $stmt->store_result();
 
-        if ($stmt->num_rows == 1) {
-            $stmt->bind_result($hash);
+        if ($stmt->num_rows === 1) {
+            $stmt->bind_result($idCliente, $hashDb, $nome);
             $stmt->fetch();
 
-            if (password_verify($_POST['password'], $hash)) {
-                $_SESSION['userName'] = $_POST['userName'];
-                $_SESSION['dataLogin'] = time();
-                $_SESSION['accessoPermesso'] = true;
-
-                header("Location: modificheSpiaggia.php");
-                exit();
+            if (hash_equals($hashDb, hash('sha256', $password))) {
+                $_SESSION['ruolo'] = 'cliente';
+                $_SESSION['cliente_id'] = $idCliente;
+                $_SESSION['email'] = $username;
+                $_SESSION['nome'] = $nome;
+                header("Location: area_clienti.php");
+                exit;
             } else {
-                echo "<p>Accesso negato: password errata!</p>";
+                $errore = "Password errata.";
+                echo "<script>alert('$errore');</script>";
+                header("refresh: 0; url=index.php");
             }
         } else {
-            echo "<p>Accesso negato: utente inesistente!</p>";
+            $errore = "Utente non trovato.";
+            echo "<script>alert('$errore');</script>";
+            header("refresh: 0; url=index.php");
         }
+    } else {
+    
+        $stmt = $conn->prepare("SELECT password FROM Amministratore WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
 
-        $stmt->close();
-        $conn->close();
+        if ($stmt->num_rows === 1) {
+            $stmt->bind_result($hashDb);
+            $stmt->fetch();
+
+            if (hash_equals($hashDb, hash('sha256', $password))) {
+                $_SESSION['ruolo'] = 'admin';
+                $_SESSION['admin_username'] = $username;
+                header("Location: modificheSpiaggia.php");
+                exit;
+            } else {
+                $errore = "Password errata.";
+                echo "<script>alert('$errore');</script>";
+                header("refresh: 0; url=index.php");
+            }
+        } else {
+            $errore = "Admin non trovato.";
+            echo "<script>alert('$errore');</script>";
+            header("refresh: 0; url=index.php");
+        }
     }
+
+    $stmt->close();
+    $conn->close();
 }
 ?>

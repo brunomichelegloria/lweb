@@ -162,6 +162,8 @@ INSERT IGNORE INTO Articolo (nome, prezzo) VALUES
 ('Abbonamento2mesi', 350),
 ('Abbonamento3mesi', 500);
 
+INSERT IGNORE INTO Amministratore (username, password) VALUES ('adminUser', 'nuovabellapw');
+
 
 -- PUBLIC
 CREATE USER IF NOT EXISTS 'public_web'@'localhost' IDENTIFIED BY 'pubPassword';
