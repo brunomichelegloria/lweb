@@ -53,29 +53,44 @@ $conn->close();
     <div id="wave3"></div>
     <div id="adminLoginBox">
         <img src="./img/beach-umbrella.svg" alt="Login" id="adminLoginIcon">
-        <div id="adminLogin">
-            <h2 style="margin-top:0;">Login Amministratore</h2>
-            <form method="POST" action="login.php">
-                <label for="username">Username:</label>
-                <input type="text" name="username" required>
-                <label for="password">Password:</label>
-                <input type="password" name="password" required>
-                <button type="submit" name="invio">Login</button>
-            </form>
-        </div>
+            <div id="adminLogin">
+                <h2 style="margin-top:0;">Login Amministratore</h2>
+                <form method="POST" action="login.php">
+                    <label for="username">Username:</label>
+                    <input type="text" name="username" required>
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" required>
+                    <button type="submit" name="invio">Login</button>
+                </form>
+            </div>
     </div>
 
     <div id="userLoginBox">
-        <img src="./img/life-belt.png" alt="Login Utente" id="userLoginIcon">
-        <div id="userLogin">
-            <h2 style="margin-top:0;">Login Utente</h2>
-            <form method="POST" action="login.php">
-                <label for="username">Username:</label>
-                <input type="text" name="username" required>
-                <label for="password">Password:</label>
-                <input type="password" name="password" required>
-                <button type="submit" name="invio">Login</button>
-            </form>
+        <div id="userLoginIconBox" style="position: relative; cursor: pointer;">
+            <span id="userLoginIconLabel" >
+                <svg viewBox="0 0 500 200" style="border: none; transform: scale(3);">
+                    <path fill="transparent" id="curve" d="M50,250 A200,200 0 0,1 450,250" />
+                    <text>
+                        <textPath alignment-baseline="top" xlink:href="#curve" startOffset="10%">
+                            Accedi!
+                        </textPath>
+                    </text>
+                </svg>
+            </span>
+            <img src="./img/life-belt.png" alt="Login Utente" id="userLoginIcon">
+        </div>
+        <div id="userLoginWrapper">
+            <div id="userLogin">
+                <h2 style="margin-top:0;">Login Utente</h2>
+                <form method="POST" action="login.php">
+                    <label for="username">E-mail:</label>
+                    <input type="text" name="username" required>
+                    <br />
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" required>
+                    <button type="submit" name="invio">Login</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -94,29 +109,21 @@ $conn->close();
             }
         });
 
+        const userIconBox = document.getElementById('userLoginIconBox');
         const userIcon = document.getElementById('userLoginIcon');
         const userLog = document.getElementById('userLogin');
+        const userLogWrapper = document.getElementById('userLoginWrapper');
 
-        userIcon.addEventListener('click', (event) => {
+        userIconBox.addEventListener('click', (event) => {
             event.stopPropagation();
-            userIcon.classList.add('animating');
-
-            setTimeout(() => {
-                userLog.style.display = 'block';
-                userLog.classList.add('appearing'); //Da fare senza timout
-            }, 400);
-            setTimeout(() => {
-                userIcon.classList.remove('animating');
-            }, 900);
-
+            userIcon.classList.add('appear');
+            userLogWrapper.classList.add('appear');
         });
 
         document.addEventListener('click', (event) => {
             if (!userLog.contains(event.target) && !userIcon.contains(event.target)) {
-                userLog.classList.remove('appearing');
-                setTimeout(() => {
-                    userLog.style.display = 'none';
-                }, 500);
+                userIcon.classList.remove('appear');
+                userLogWrapper.classList.remove('appear');
             }
         });
     </script>

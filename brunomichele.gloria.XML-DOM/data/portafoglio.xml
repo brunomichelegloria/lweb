@@ -1,0 +1,31 @@
+<portafoglio>
+  <asset>
+    <nome>Apple</nome>
+    <ticker>AAPL</ticker>
+    <target>40</target>
+    <operazioni>
+      <operazione>
+        <data>2024-05-01</data>
+        <quantita>3</quantita>
+        <prezzo>160</prezzo>
+      </operazione>
+      <operazione>
+        <data>2024-06-01</data>
+        <quantita>2</quantita>
+        <prezzo>170</prezzo>
+      </operazione>
+    </operazioni>
+  </asset>
+  <asset>
+    <nome>Google</nome>
+    <ticker>GOOGL</ticker>
+    <target>60</target>
+    <operazioni>
+      <operazione>
+        <data>2024-06-15</data>
+        <quantita>5</quantita>
+        <prezzo>120</prezzo>
+      </operazione>
+    </operazioni>
+  </asset>
+</portafoglio>

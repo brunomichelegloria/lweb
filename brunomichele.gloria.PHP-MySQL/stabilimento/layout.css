@@ -173,9 +173,9 @@ svg.abbonamento path { fill: darkviolet;}
 #userLoginBox {
 	position: absolute;
 	display: flex;
-	top: 3vh;
+	top: 0vh;
 	flex-direction: row;
-	align-items: flex-start;
+	align-items: center;
 	object-fit: contain;
 	direction: ltr;
 	right: 5vw;
@@ -192,44 +192,62 @@ svg.abbonamento path { fill: darkviolet;}
 	height: auto;
 	z-index: 10;
 }
+#userLoginIcon.appear {
+    animation: onClickUserIcon .35s ease-out normal;
+}
+#userLoginIcon.disappear {
+	animation: onClickUserIcon .35s ease-in reverse;
+}
+
+#userLoginIconLabel {
+    position: absolute;
+	top: 0;
+	left: 23%;
+    margin-bottom: 0.3em;
+	font: '', sans-serif;
+    font-size: 8vw;
+	font-weight: 800;
+    color: #333;
+	z-index: 110;
+}
+
+#userLoginWrapper {
+	width: 0;
+	height: auto;
+	white-space: nowrap;
+	overflow-x: hidden;
+	transition: width .35s ease-in-out;
+}
+#userLoginWrapper.appear {
+    width:21vw;
+}
+#userLoginWrapper.disappear {
+	animation: onClickUserLogin .35s ease-in reverse;
+}
 
 #userLogin {
-	position: absolute;
-	display: none;
+	position: relative;
 	top: -0.5vw;
 	transform-origin: right center;
 	right: 0;
-	width: 0vw;
+	width: 20vw;
+	height: 15vh;
 	background-color: rgb(173, 147, 113);
 	padding: 2vh;
-	overflow: hidden;
+	overflow-x: hidden;
 	border: 0.5vh solid rgb(173, 138, 93);
 	border-radius: 0.5vh;
-	z-index: 1000;
-}
-
-#userLoginIcon.animating {
-    animation: onClickUserIcon 4s ease-out normal;
+	z-index: 100;
 }
 
 @keyframes onClickUserIcon {
-	0% { transform: translateX(0) rotateZ(0deg); }
-	100% { transform: translateX(-20vw) rotateZ(720deg); }
-}
-
-#userLogin {
-    /*animation: onClickUserLogin 4s ease-out normal;*/
-	width: 20vw;
+	0% { transform:  rotateZ(0deg); }
+	100% { transform:  rotateZ(-360deg); }
 }
 
 @keyframes onClickUserLogin {
-	0% {transform: scaleX(0); }
-	100% {transform: scaleX(1); }	
-}
-
-#userLogin.appearing {
-    opacity: 1;
-    transform: translateX(0) scale(1);
+	0% {width: 0;}
+	100% {width: 21vw;} 	
 }
 
 
