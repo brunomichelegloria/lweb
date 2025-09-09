@@ -1,31 +1,58 @@
-<portafoglio>
-  <asset>
-    <nome>Apple</nome>
-    <ticker>AAPL</ticker>
-    <target>40</target>
-    <operazioni>
-      <operazione>
-        <data>2024-05-01</data>
-        <quantita>3</quantita>
-        <prezzo>160</prezzo>
-      </operazione>
-      <operazione>
-        <data>2024-06-01</data>
-        <quantita>2</quantita>
-        <prezzo>170</prezzo>
-      </operazione>
-    </operazioni>
-  </asset>
-  <asset>
-    <nome>Google</nome>
-    <ticker>GOOGL</ticker>
-    <target>60</target>
-    <operazioni>
-      <operazione>
-        <data>2024-06-15</data>
-        <quantita>5</quantita>
-        <prezzo>120</prezzo>
-      </operazione>
-    </operazioni>
-  </asset>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE portafoglio SYSTEM "portafoglio.dtd">
+<portafoglio valuta="EUR">
+  
+  <informazioni tolleranza="5" ultimoAggiornamento="2025-09-08"/>
+
+  <assets>
+    <azione ticker="AAPL" valuta="USD">
+      <nome>Apple</nome>
+      <target>30</target>
+      <operazioni>
+        <operazione valuta="USD">
+          <data>2024-05-01</data>
+          <quantita>3</quantita>
+          <prezzo>160</prezzo>
+        </operazione>
+        <operazione valuta="USD">
+          <data>2024-06-01</data>
+          <quantita>2</quantita>
+          <prezzo>170</prezzo>
+        </operazione>
+      </operazioni>
+    </azione>
+
+    <azione ticker="GOOGL" valuta="USD">
+      <nome>Google</nome>
+      <target>45</target>
+      <operazioni>
+        <operazione valuta="USD">
+          <data>2024-06-15</data>
+          <quantita>5</quantita>
+          <prezzo>120</prezzo>
+        </operazione>
+      </operazioni>
+    </azione>
+
+    <obbligazione ticker="IT0001278511" valuta="EUR">
+      <nome>Btp-1nv29 5,25%</nome>
+      <target>25</target>
+      <operazioni>
+        <operazione valuta="EUR">
+          <data>2024-03-01</data>
+          <quantita>10</quantita>
+          <prezzo>101.45</prezzo>
+        </operazione>
+      </operazioni>
+      <cedola>5.25</cedola>
+      <frequenza_cedola>annuale</frequenza_cedola>
+      <scadenza>2029-11-01</scadenza>
+    </obbligazione>
+  </assets>
+
+  <liquidita valuta="EUR">
+    <totale>0</totale>
+    <target>0</target>
+  </liquidita>
+
 </portafoglio>

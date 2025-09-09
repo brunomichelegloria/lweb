@@ -16,7 +16,6 @@ curl_close($ch);
 
 $data = json_decode($response, true);
 
-// verifica e restituisce il prezzo
 if (
     isset($data['chart']['result'][0]['meta']['regularMarketPrice']) &&
     is_numeric($data['chart']['result'][0]['meta']['regularMarketPrice'])

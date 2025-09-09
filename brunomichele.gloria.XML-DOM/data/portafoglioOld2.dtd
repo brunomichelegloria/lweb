@@ -1,0 +1,27 @@
+<!ENTITY EUR "€">
+<!ENTITY USD "$">
+
+<!NOTATION pdf SYSTEM "application/pdf">
+<!ATTLIST documento tipo NOTATION (pdf) #REQUIRED>
+
+<!ELEMENT portafoglio (informazioni, asset+)>
+
+<!ELEMENT informazioni (ultima_data_aggiornamento)>
+<!ELEMENT ultima_data_aggiornamento (#PCDATA)>
+
+<!ELEMENT asset (nome, tipo, ticker?, target?, totale?, operazioni?)>
+<!ATTLIST asset 
+    categoria (azione | etf | obbligazione | liquidita) #REQUIRED
+>
+
+<!ELEMENT nome (#PCDATA)>
+<!ELEMENT tipo (#PCDATA)>
+<!ELEMENT ticker (#PCDATA)>
+<!ELEMENT target (#PCDATA)>
+<!ELEMENT totale (#PCDATA)>
+
+<!ELEMENT operazioni (operazione+)>
+<!ELEMENT operazione (data, quantita, prezzo)>
+<!ELEMENT data (#PCDATA)>
+<!ELEMENT quantita (#PCDATA)>
+<!ELEMENT prezzo (#PCDATA)>

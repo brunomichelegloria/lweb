@@ -1,0 +1,11 @@
+<!ELEMENT portafoglio (asset+)>
+<!ELEMENT asset (nome, tipo, ticker, target, operazioni)>
+<!ELEMENT nome (#PCDATA)>
+<!ELEMENT tipo (#PCDATA)>
+<!ELEMENT ticker (#PCDATA)>
+<!ELEMENT target (#PCDATA)>
+<!ELEMENT operazioni (operazione+)>
+<!ELEMENT operazione (data, quantita, prezzo)>
+<!ELEMENT data (#PCDATA)>
+<!ELEMENT quantita (#PCDATA)>
+<!ELEMENT prezzo (#PCDATA)>
