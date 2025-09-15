@@ -4,32 +4,32 @@ header('Content-Type: text/html; charset=utf-8');
 function toFloat(?string $s): float {
     if ($s === null) return 0.0;
     $s = trim($s);
+    // 1.234,56 -> 1234.56
     $s = str_replace(['.', ','], ['', '.'], $s);
     return is_numeric($s) ? (float)$s : 0.0;
 }
 
 $xml = new DOMDocument();
 $xml->preserveWhiteSpace = false;
-$xml->load('./data/portafoglio.xml');
+$xml->load('data/portafoglio.xml');
 
 $xp = new DOMXPath($xml);
 
-// valuta del portafoglio e simbolo
+// === metadati portafoglio ===
 $portNode = $xp->query('/portafoglio')->item(0);
-$valuta = $portNode && $portNode->hasAttribute('valuta') ? $portNode->getAttribute('valuta') : 'EUR';
-$symbols = ['EUR' => '€', 'USD' => '$', 'GBP' => '£'];
-$symbol = $symbols[strtoupper($valuta)] ?? $valuta;
+$valuta   = $portNode && $portNode->hasAttribute('valuta') ? $portNode->getAttribute('valuta') : 'EUR';
+$symbols  = ['EUR' => '€', 'USD' => '$', 'GBP' => '£'];
+$symbol   = $symbols[strtoupper($valuta)] ?? $valuta;
 
-// tolleranza / ultimo aggiornamento
-$info = $xp->query('/portafoglio/informazioni')->item(0);
-$tolleranza = $info && $info->hasAttribute('tolleranza') ? $info->getAttribute('tolleranza') : '';
-$ultimoAgg = $info && $info->hasAttribute('ultimoAggiornamento') ? $info->getAttribute('ultimoAggiornamento') : '';
+$info          = $xp->query('/portafoglio/informazioni')->item(0);
+$tolleranza    = $info && $info->hasAttribute('tolleranza') ? $info->getAttribute('tolleranza') : '';
+$ultimoAgg     = $info && $info->hasAttribute('ultimoAggiornamento') ? $info->getAttribute('ultimoAggiornamento') : '';
+$commissione   = $info && $info->hasAttribute('commissione') ? $info->getAttribute('commissione') : '0';
 
-// lista asset
+// === lista asset ===
 $nodes = $xp->query('/portafoglio/assets/*[self::azione or self::etf or self::obbligazione]');
 
-// liquidità
-$liqNode = $xp->query('/portafoglio/liquidita/totale')->item(0);
+$liqNode   = $xp->query('/portafoglio/liquidita/totale')->item(0);
 $liquidita = $liqNode ? toFloat($liqNode->textContent) : 0.0;
 
 ob_start();
@@ -40,25 +40,25 @@ ob_start();
        <?php if ($tolleranza !== ''): ?>
        data-tolleranza="<?php echo htmlspecialchars($tolleranza); ?>"
        <?php endif; ?>
+       data-commissione="<?php echo htmlspecialchars($commissione); ?>"
 >
-    <thead>
-        <tr>
-            <th>Tipo</th>
-            <th>Nome</th>
-            <th>Qty</th>
-            <th>Prezzo</th>
-            <th>Valore</th>
-            <th>Attuale %</th>
-            <th>Target %</th>
-            <th>ΔQty</th>
-        </tr>
-    </thead>
-    <tbody>
+  <thead>
+    <tr>
+      <th>Tipo</th>
+      <th>Nome</th>
+      <th>Qty</th>
+      <th>Prezzo</th>
+      <th>Valore</th>
+      <th>Attuale %</th>
+      <th>Target %</th>
+      <th>(Δ)Qty</th>
+    </tr>
+  </thead>
+  <tbody>
 <?php
 foreach ($nodes as $n) {
-    /** @var DOMElement $n */
     $tipo   = strtolower($n->nodeName); // 'azione' | 'etf' | 'obbligazione'
-    $ticker = $n->getAttribute('ticker'); // resta nei data-* per fetch prezzi
+    $ticker = $n->getAttribute('ticker');
 
     $nomeNode = $xp->query('nome', $n)->item(0);
     $nome = $nomeNode ? trim($nomeNode->textContent) : $ticker;
@@ -66,14 +66,37 @@ foreach ($nodes as $n) {
     $targetNode = $xp->query('target', $n)->item(0);
     $target = $targetNode ? toFloat($targetNode->textContent) : 0.0;
 
-    // somma quantità dalle operazioni
-    $ops = $xp->query('operazioni/operazione/quantita', $n);
-    $qty = 0.0;
-    foreach ($ops as $q) { $qty += toFloat($q->textContent); }
+    // qty corrente = somma delle quantita' in <operazioni>
+    $opsQ = $xp->query('operazioni/operazione/quantita', $n);
+    $qty  = 0.0;
+    foreach ($opsQ as $q) { $qty += toFloat($q->textContent); }
+
+    // costo medio WAC (solo su acquisti; le vendite non lo cambiano)
+    $avgCost = 0.0;
+    $qtyCum  = 0.0;
+    $opsAll  = $xp->query('operazioni/operazione', $n);
+    foreach ($opsAll as $op) {
+        $qNode = $xp->query('quantita', $op)->item(0);
+        $pNode = $xp->query('prezzo',   $op)->item(0);
+        $q  = $qNode ? toFloat($qNode->textContent) : 0.0;
+        $pr = $pNode ? toFloat($pNode->textContent) : 0.0;
+
+        if ($q > 0) {
+            $avgCost = ($avgCost * $qtyCum + $q * $pr) / ($qtyCum + $q);
+            $qtyCum += $q;
+        } else if ($q < 0) {
+            $qtyCum += $q;
+            if ($qtyCum < 0) $qtyCum = 0;
+        }
+    }
+
+    $taxRateRow = $n->hasAttribute('taxRate') ? $n->getAttribute('taxRate') : '0.26';
 
     echo '<tr data-type="', htmlspecialchars($tipo),
          '" data-ticker="', htmlspecialchars($ticker),
-         '" data-quantita="', htmlspecialchars($qty), '">';
+         '" data-quantita="', htmlspecialchars($qty),
+         '" data-costo="', htmlspecialchars(number_format($avgCost, 6, '.', '')),
+         '" data-taxrate-asset="', htmlspecialchars($taxRateRow), '">';
 
     echo '  <td class="tipo">', htmlspecialchars($tipo), '</td>';
     echo '  <td class="nome">', htmlspecialchars($nome), '</td>';
@@ -86,21 +109,26 @@ foreach ($nodes as $n) {
     echo '</tr>', PHP_EOL;
 }
 ?>
-    </tbody>
-    <tfoot>
-        <tr>
-            <td colspan="8">
-                Liquidità:
-                <span id="liquidita-totale"><?php echo htmlspecialchars($symbol . ' ' . number_format($liquidita, 2, ',', '.')); ?></span>
-                <?php if ($tolleranza !== '' || $ultimoAgg !== ''): ?>
-                <span class="muted" style="margin-left:1rem;">
-                <?php if ($tolleranza !== '') echo 'Tolleranza: ', htmlspecialchars($tolleranza), '%'; ?>
-                <?php if ($ultimoAgg !== '') echo ' &middot; Ultimo aggiornamento: ', htmlspecialchars($ultimoAgg); ?>
-                </span>
-                <?php endif; ?>
-            </td>
-        </tr>
-    </tfoot>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="8">
+        Liquidità:
+        <span id="liquidita-totale"><?php echo htmlspecialchars($symbol . ' ' . number_format($liquidita, 2, ',', '.')); ?></span>
+        <?php if ($tolleranza !== '' || $ultimoAgg !== '' || $commissione !== '0'): ?>
+        <span style="margin-left:1rem; opacity:.7;">
+          <?php
+            $parts = [];
+            if ($tolleranza !== '')   $parts[] = 'Tolleranza: ' . htmlspecialchars($tolleranza) . '%';
+            if ($commissione !== '0') $parts[] = 'Commissione: ' . htmlspecialchars($commissione) . ' ' . htmlspecialchars($symbol);
+            if ($ultimoAgg !== '')    $parts[] = 'Ultimo agg.: ' . htmlspecialchars($ultimoAgg);
+            echo implode(' · ', $parts);
+          ?>
+        </span>
+        <?php endif; ?>
+      </td>
+    </tr>
+  </tfoot>
 </table>
 <?php
 echo ob_get_clean();

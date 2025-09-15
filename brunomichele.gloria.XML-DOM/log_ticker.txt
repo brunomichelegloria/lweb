@@ -1,4 +1,4 @@
 Array
 (
-    [ticker] => IT0001278511
+    [ticker] => IT0005532723
 )

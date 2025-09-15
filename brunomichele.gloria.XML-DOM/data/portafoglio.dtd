@@ -21,6 +21,7 @@
     <!ATTLIST informazioni
         tolleranza CDATA #REQUIRED
         ultimoAggiornamento CDATA #REQUIRED
+        commissione CDATA "0"
     >
 
     <!-- ===== ASSET NEGOZIABILI ===== -->
@@ -31,6 +32,7 @@
         <!ATTLIST obbligazione
             ticker CDATA #REQUIRED
             valuta CDATA "EUR"
+            taxRate CDATA #IMPLIED
         >
 
         <!-- AZIONE -->
@@ -38,6 +40,7 @@
         <!ATTLIST azione
             ticker CDATA #REQUIRED
             valuta CDATA "EUR"
+            taxRate CDATA #IMPLIED
         >
 
         <!-- ETF -->
@@ -45,6 +48,7 @@
         <!ATTLIST etf
             ticker CDATA #REQUIRED
             valuta CDATA "EUR"
+            taxRate CDATA #IMPLIED
         >
 
             <!-- Elementi comuni -->

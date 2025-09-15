@@ -26,7 +26,7 @@ function getHtml($url, $headers) {
     return $html;
 }
 
-//Cerca la pagina bond
+//Cerca la pagina
 $search_html = getHtml($search_url, $headers);
 $dom = new DOMDocument();
 libxml_use_internal_errors(true);
@@ -43,7 +43,7 @@ if ($items->length === 0) {
 $relative_link = $items[0]->getAttribute("href");
 $full_link = "https://it.investing.com" . $relative_link;
 
-//Estrae il prezzo dalla pagina
+//Estrae il prezzo
 $bond_html = getHtml($full_link, $headers);
 $dom2 = new DOMDocument();
 libxml_use_internal_errors(true);
@@ -60,6 +60,52 @@ foreach ($meta_nodes as $meta) {
         exit;
     }
 }
+
+// ==== FALLBACK: Borsa Italiana (se Investing non ha dato esito) ====
+    $borsaUrl = "https://www.borsaitaliana.it/borsa/search/scheda.html?code=" . urlencode($isin) . "&lang=it";
+
+    $ch = curl_init($borsaUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_ENCODING       => '', // gzip
+        CURLOPT_CONNECTTIMEOUT => 8,
+        CURLOPT_TIMEOUT        => 12,
+        CURLOPT_USERAGENT      => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:141.0) Gecko/20100101 Firefox/141.0',
+        CURLOPT_HTTPHEADER     => ['Accept-Language: it-IT,it;q=0.9,en;q=0.8'],
+    ]);
+    $html = curl_exec($ch);
+    $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($http >= 200 && $http < 300 && $html) {
+        // parse -> trova il primo numero in .summary-value
+        $prev = libxml_use_internal_errors(true);
+        $dom = new DOMDocument();
+        @$dom->loadHTML($html);
+        libxml_clear_errors();
+        libxml_use_internal_errors($prev);
+
+        $xp = new DOMXPath($dom);
+
+        // prende il primo <strong> in .summary-value
+        $node = $xp->query("(//div[contains(concat(' ', normalize-space(@class), ' '), ' summary-value ')]//strong)[1]")->item(0);
+
+        if ($node) {
+            $raw = trim($node->textContent);
+
+            // estrae il primo valore numerico (. come separatore migliaia , come decimale)
+            if (preg_match('/([0-9][0-9\.\,]*)/', $raw, $m)) {
+                $num = $m[1];
+                $num = str_replace(['.', ','], ['', '.'], $num);
+
+                if (is_numeric($num)) {
+                    echo json_encode(['price' => (float)$num]);
+                    exit;
+                }
+            }
+        }
+    }
 
 http_response_code(422);
 echo json_encode(['error' => 'Price not found']);

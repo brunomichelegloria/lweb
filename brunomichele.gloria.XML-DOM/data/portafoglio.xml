@@ -2,7 +2,7 @@
 <!DOCTYPE portafoglio SYSTEM "portafoglio.dtd">
 <portafoglio valuta="EUR">
   
-  <informazioni tolleranza="5" ultimoAggiornamento="2025-09-08"/>
+  <informazioni tolleranza="5" ultimoAggiornamento="2025-09-08" commissione="5"/>
 
   <assets>
     <azione ticker="AAPL" valuta="USD">
@@ -11,7 +11,7 @@
       <operazioni>
         <operazione valuta="USD">
           <data>2024-05-01</data>
-          <quantita>3</quantita>
+          <quantita>9</quantita>
           <prezzo>160</prezzo>
         </operazione>
         <operazione valuta="USD">
@@ -28,31 +28,31 @@
       <operazioni>
         <operazione valuta="USD">
           <data>2024-06-15</data>
-          <quantita>5</quantita>
+          <quantita>16</quantita>
           <prezzo>120</prezzo>
         </operazione>
       </operazioni>
     </azione>
 
-    <obbligazione ticker="IT0001278511" valuta="EUR">
-      <nome>Btp-1nv29 5,25%</nome>
+    <obbligazione ticker="IT0005532723" valuta="EUR" taxRate="12.5">
+      <nome>Btp Italia Mz28 Eur</nome>
       <target>25</target>
       <operazioni>
         <operazione valuta="EUR">
-          <data>2024-03-01</data>
-          <quantita>10</quantita>
-          <prezzo>101.45</prezzo>
+          <data>2025-09-10</data>
+          <quantita>2000</quantita>
+          <prezzo>101,16062</prezzo>
         </operazione>
       </operazioni>
-      <cedola>5.25</cedola>
-      <frequenza_cedola>annuale</frequenza_cedola>
-      <scadenza>2029-11-01</scadenza>
+      <cedola>2,00 (indicizzato)</cedola>
+      <frequenza_cedola>Semestrale</frequenza_cedola>
+      <scadenza>2028-03-14</scadenza>
     </obbligazione>
   </assets>
 
   <liquidita valuta="EUR">
-    <totale>0</totale>
-    <target>0</target>
+    <totale>300</totale>
+    <target></target>
   </liquidita>
 
 </portafoglio>
