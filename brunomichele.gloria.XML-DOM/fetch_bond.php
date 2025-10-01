@@ -95,11 +95,16 @@ foreach ($meta_nodes as $meta) {
             $raw = trim($node->textContent);
 
             // estrae il primo valore numerico (. come separatore migliaia , come decimale)
-            if (preg_match('/([0-9][0-9\.\,]*)/', $raw, $m)) {
-                $num = $m[1];
-                $num = str_replace(['.', ','], ['', '.'], $num);
+            $txt = trim(str_replace("\xc2\xa0", ' ', (string)$raw)); // normalizza nbsp
+            if (preg_match('/\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+(?:,\d+)?/', $txt, $m)) {
+                $num = $m[0];
+                // normalizza "1.234,56" -> "1234.56"
+                $num = str_replace('.', '', $num);
+                $num = str_replace(',', '.', $num);
 
                 if (is_numeric($num)) {
+                    header('Content-Type: application/json; charset=utf-8');
+                    // Ritorniamo la QUOTA (€/100) in 'price'; in JS farai unitPrice = price / 100.
                     echo json_encode(['price' => (float)$num]);
                     exit;
                 }

@@ -2,10 +2,6 @@
 header('Content-Type: text/html; charset=utf-8');
 
 function toFloat(?string $s): float {
-    if ($s === null) return 0.0;
-    $s = trim($s);
-    // 1.234,56 -> 1234.56
-    $s = str_replace(['.', ','], ['', '.'], $s);
     return is_numeric($s) ? (float)$s : 0.0;
 }
 
@@ -31,16 +27,14 @@ $nodes = $xp->query('/portafoglio/assets/*[self::azione or self::etf or self::ob
 
 $liqNode   = $xp->query('/portafoglio/liquidita/totale')->item(0);
 $liquidita = $liqNode ? toFloat($liqNode->textContent) : 0.0;
+$liqTargetNode = $xp->query('/portafoglio/liquidita/target')->item(0);
+$liqTarget = $liqTargetNode ? toFloat($liqTargetNode->textContent) : 0.0;
 
-ob_start();
+
 ?>
 <table id="tab-portafoglio"
        data-valuta="<?php echo htmlspecialchars($valuta); ?>"
        data-symbol="<?php echo htmlspecialchars($symbol); ?>"
-       <?php if ($tolleranza !== ''): ?>
-       data-tolleranza="<?php echo htmlspecialchars($tolleranza); ?>"
-       <?php endif; ?>
-       data-commissione="<?php echo htmlspecialchars($commissione); ?>"
 >
   <thead>
     <tr>
@@ -67,27 +61,31 @@ foreach ($nodes as $n) {
     $target = $targetNode ? toFloat($targetNode->textContent) : 0.0;
 
     // qty corrente = somma delle quantita' in <operazioni>
-    $opsQ = $xp->query('operazioni/operazione/quantita', $n);
-    $qty  = 0.0;
-    foreach ($opsQ as $q) { $qty += toFloat($q->textContent); }
+    if ($tipo !== 'bucket') {
+        $opsQ = $xp->query('operazioni/operazione/quantita', $n);
+        $qty  = 0.0;
+        foreach ($opsQ as $q) { $qty += toFloat($q->textContent); }
 
-    // costo medio WAC (solo su acquisti; le vendite non lo cambiano)
-    $avgCost = 0.0;
-    $qtyCum  = 0.0;
-    $opsAll  = $xp->query('operazioni/operazione', $n);
-    foreach ($opsAll as $op) {
-        $qNode = $xp->query('quantita', $op)->item(0);
-        $pNode = $xp->query('prezzo',   $op)->item(0);
-        $q  = $qNode ? toFloat($qNode->textContent) : 0.0;
-        $pr = $pNode ? toFloat($pNode->textContent) : 0.0;
+        // costo medio WAC (solo su acquisti; le vendite non lo cambiano)
+        $avgCost = 0.0;
+        $qtyCum  = 0.0;
+        $opsAll  = $xp->query('operazioni/operazione', $n);
+        foreach ($opsAll as $op) {
+            $qNode = $xp->query('quantita', $op)->item(0);
+            $pNode = $xp->query('prezzo',   $op)->item(0);
+            $q  = $qNode ? toFloat($qNode->textContent) : 0.0;
+            $pr = $pNode ? toFloat($pNode->textContent) : 0.0;
 
-        if ($q > 0) {
-            $avgCost = ($avgCost * $qtyCum + $q * $pr) / ($qtyCum + $q);
-            $qtyCum += $q;
-        } else if ($q < 0) {
-            $qtyCum += $q;
-            if ($qtyCum < 0) $qtyCum = 0;
+            if ($q > 0) {
+                $avgCost = ($avgCost * $qtyCum + $q * $pr) / ($qtyCum + $q);
+                $qtyCum += $q;
+            } else if ($q < 0) {
+                $qtyCum += $q;
+                if ($qtyCum < 0) $qtyCum = 0;
+            }
         }
+    } else {
+        $qty='-';
     }
 
     $taxRateRow = $n->hasAttribute('taxRate') ? $n->getAttribute('taxRate') : '0.26';
@@ -114,21 +112,24 @@ foreach ($nodes as $n) {
     <tr>
       <td colspan="8">
         Liquidità:
-        <span id="liquidita-totale"><?php echo htmlspecialchars($symbol . ' ' . number_format($liquidita, 2, ',', '.')); ?></span>
+        <span id="liquidita-totale" 
+              data-liqTarget="<?php echo htmlspecialchars($liqTarget); ?>">
+            <?php echo htmlspecialchars(number_format($liquidita, 2, ',', '.'). ' ' . $symbol); ?>
+        </span>
         <?php if ($tolleranza !== '' || $ultimoAgg !== '' || $commissione !== '0'): ?>
-        <span style="margin-left:1rem; opacity:.7;">
-          <?php
-            $parts = [];
-            if ($tolleranza !== '')   $parts[] = 'Tolleranza: ' . htmlspecialchars($tolleranza) . '%';
-            if ($commissione !== '0') $parts[] = 'Commissione: ' . htmlspecialchars($commissione) . ' ' . htmlspecialchars($symbol);
-            if ($ultimoAgg !== '')    $parts[] = 'Ultimo agg.: ' . htmlspecialchars($ultimoAgg);
-            echo implode(' · ', $parts);
-          ?>
+        <span id="footer-data"
+              data-tolleranza="<?php echo htmlspecialchars($tolleranza); ?>"
+              data-commissione="<?php echo htmlspecialchars($commissione); ?>">
+             ·
+            <?php
+                $parts = [];
+                if ($tolleranza !== '')   $parts[] = "&nbsp" . 'Tolleranza: ' . htmlspecialchars($tolleranza) . '%';
+                if ($commissione !== '0') $parts[] = "&nbsp" . 'Commissione: ' . htmlspecialchars($commissione) . ' ' . htmlspecialchars($symbol);
+                echo implode(' · ', $parts);
+            ?>
         </span>
         <?php endif; ?>
       </td>
     </tr>
   </tfoot>
 </table>
-<?php
-echo ob_get_clean();

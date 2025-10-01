@@ -28,13 +28,13 @@
       <operazioni>
         <operazione valuta="USD">
           <data>2024-06-15</data>
-          <quantita>16</quantita>
+          <quantita>17</quantita>
           <prezzo>120</prezzo>
         </operazione>
       </operazioni>
     </azione>
 
-    <obbligazione ticker="IT0005532723" valuta="EUR" taxRate="12.5">
+    <!--<obbligazione ticker="IT0005532723" valuta="EUR" taxRate="12.5">
       <nome>Btp Italia Mz28 Eur</nome>
       <target>25</target>
       <operazioni>
@@ -47,12 +47,12 @@
       <cedola>2,00 (indicizzato)</cedola>
       <frequenza_cedola>Semestrale</frequenza_cedola>
       <scadenza>2028-03-14</scadenza>
-    </obbligazione>
+    </obbligazione>-->
   </assets>
 
   <liquidita valuta="EUR">
     <totale>300</totale>
-    <target></target>
+    <target>0</target>
   </liquidita>
 
 </portafoglio>

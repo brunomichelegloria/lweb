@@ -27,6 +27,11 @@ th, td {
     text-align: center;
 }
 
+#footer-data {
+    margin-left:1vh; 
+    opacity:.7;
+}
+
 #graph {
     height: 20vh;
     width: auto;

@@ -22,17 +22,21 @@
         tolleranza CDATA #REQUIRED
         ultimoAggiornamento CDATA #REQUIRED
         commissione CDATA "0"
+        defaultTradeStepAz CDATA "1"
+        defaultTradeStepEtf CDATA "1"
+        defaultTradeStepBond CDATA "1"
     >
 
     <!-- ===== ASSET NEGOZIABILI ===== -->
-    <!ELEMENT assets (obbligazione | azione | etf)*>
+    <!ELEMENT assets (obbligazione | azione | etf | bucket)*>
 
         <!-- OBBLIGAZIONE -->
         <!ELEMENT obbligazione (nome?, target?, operazioni, cedola?, frequenza_cedola?, scadenza?)>
         <!ATTLIST obbligazione
             ticker CDATA #REQUIRED
             valuta CDATA "EUR"
-            taxRate CDATA #IMPLIED
+            taxRate CDATA "0.26"
+            tradeStep CDATA #IMPLIED
         >
 
         <!-- AZIONE -->
@@ -40,7 +44,8 @@
         <!ATTLIST azione
             ticker CDATA #REQUIRED
             valuta CDATA "EUR"
-            taxRate CDATA #IMPLIED
+            taxRate CDATA "0.26"
+            tradeStep CDATA #IMPLIED
         >
 
         <!-- ETF -->
@@ -48,7 +53,14 @@
         <!ATTLIST etf
             ticker CDATA #REQUIRED
             valuta CDATA "EUR"
-            taxRate CDATA #IMPLIED
+            taxRate CDATA "0.26"
+            tradeStep CDATA #IMPLIED
+        >
+
+        <!-- BUCKET (per raggruppare più asset simili) -->
+        <!ELEMENT bucket (nome, target?, (azione|etf|obbligazione|bucket)+)>
+        <!ATTLIST bucket
+            tradeStep CDATA #IMPLIED
         >
 
             <!-- Elementi comuni -->
