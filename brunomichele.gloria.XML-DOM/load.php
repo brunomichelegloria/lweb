@@ -23,7 +23,7 @@ $ultimoAgg     = $info && $info->hasAttribute('ultimoAggiornamento') ? $info->ge
 $commissione   = $info && $info->hasAttribute('commissione') ? $info->getAttribute('commissione') : '0';
 
 // === lista asset ===
-$nodes = $xp->query('/portafoglio/assets/*[self::azione or self::etf or self::obbligazione]');
+$nodes = $xp->query('/portafoglio/assets/*[self::azione or self::etf or self::obbligazione or self::bucket]');
 
 $liqNode   = $xp->query('/portafoglio/liquidita/totale')->item(0);
 $liquidita = $liqNode ? toFloat($liqNode->textContent) : 0.0;
@@ -58,12 +58,12 @@ foreach ($nodes as $n) {
     $nome = $nomeNode ? trim($nomeNode->textContent) : $ticker;
 
     $targetNode = $xp->query('target', $n)->item(0);
-    $target = $targetNode ? toFloat($targetNode->textContent) : 0.0;
+    $target = $targetNode ? toFloat($targetNode->textContent) : '-';
 
     // qty corrente = somma delle quantita' in <operazioni>
     if ($tipo !== 'bucket') {
         $opsQ = $xp->query('operazioni/operazione/quantita', $n);
-        $qty  = 0.0;
+        $qty  = (float)0.0;
         foreach ($opsQ as $q) { $qty += toFloat($q->textContent); }
 
         // costo medio WAC (solo su acquisti; le vendite non lo cambiano)
@@ -85,7 +85,7 @@ foreach ($nodes as $n) {
             }
         }
     } else {
-        $qty='-';
+        $qty= (string)'-';
     }
 
     $taxRateRow = $n->hasAttribute('taxRate') ? $n->getAttribute('taxRate') : '0.26';
@@ -114,7 +114,7 @@ foreach ($nodes as $n) {
         Liquidità:
         <span id="liquidita-totale" 
               data-liqTarget="<?php echo htmlspecialchars($liqTarget); ?>">
-            <?php echo htmlspecialchars(number_format($liquidita, 2, ',', '.'). ' ' . $symbol); ?>
+            <?php echo htmlspecialchars(number_format($liquidita, 2, ',', '.') . $symbol); ?>
         </span>
         <?php if ($tolleranza !== '' || $ultimoAgg !== '' || $commissione !== '0'): ?>
         <span id="footer-data"
@@ -124,7 +124,7 @@ foreach ($nodes as $n) {
             <?php
                 $parts = [];
                 if ($tolleranza !== '')   $parts[] = "&nbsp" . 'Tolleranza: ' . htmlspecialchars($tolleranza) . '%';
-                if ($commissione !== '0') $parts[] = "&nbsp" . 'Commissione: ' . htmlspecialchars($commissione) . ' ' . htmlspecialchars($symbol);
+                if ($commissione !== '0') $parts[] = "&nbsp" . 'Commissione: ' . htmlspecialchars($commissione) . htmlspecialchars($symbol);
                 echo implode(' · ', $parts);
             ?>
         </span>

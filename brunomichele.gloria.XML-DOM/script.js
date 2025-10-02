@@ -26,8 +26,8 @@ async function getBondPrice(ticker) {
     }
 }
 
-async function aggiornaPrezzi() {
-    const tab = document.getElementById('tab-portafoglio');
+async function aggiornaPrezzi($tabName) {
+    const tab = document.getElementById($tabName);
     const righe = document.querySelectorAll('table tbody tr[data-ticker]');
 
     let totaleAsset = 0;
@@ -36,11 +36,14 @@ async function aggiornaPrezzi() {
     const liqNum = parseFloat(liqTxt.replace(/[^\d,-.]/g,'').replace(/\./g,'').replace(',', '.')) || 0;
     const tolleranza = document.getElementById('footer-data')?.dataset.tolleranza || '';
     const commissione = document.getElementById('footer-data')?.dataset.commissione || '';
+    let totaleTarget = 0;
+    let numUntargeted = 0;
 
     for (const riga of righe) {
         const tipo = (riga.dataset.type || '').toLowerCase();
         const ticker = riga.dataset.ticker;
         const qty = parseFloat(riga.dataset.quantita || '0');
+
 
         let price = null;
         try {
@@ -79,8 +82,12 @@ async function aggiornaPrezzi() {
             riga.dataset.prezzo = '';
             riga.dataset.valore = '';
         }
-
+        const targetCell = riga.querySelector('.target');
+        numUntargeted += (targetCell?.textContent === '-') ? 1 : 0;
+        totaleTarget += parseFloat(targetCell?.textContent);
     }
+
+    const untargeted = totaleTarget < 100 ? (100 - totaleTarget)/numUntargeted : 0;
 
     // % attuale per riga, e "Conforme" rispetto alla tolleranza
     const totaleBase = totaleAsset + liqNum;
@@ -98,7 +105,7 @@ async function aggiornaPrezzi() {
 }
 
 function generaGrafico(liqAttualePerc) {
-    const righe = document.querySelectorAll('table tr[data-ticker]');
+    const righe = document.querySelectorAll('table tr[data-type]');
     const labels = [];
     const targets = [];
     const data = [];
@@ -111,7 +118,7 @@ function generaGrafico(liqAttualePerc) {
         const nome = riga.querySelector('.nome').textContent;
         const attuale = parseFloat(riga.querySelector('.attuale').textContent);
         const target = parseFloat(riga.querySelector('.target').textContent);
-        if (attuale > 0) {
+        if (attuale > 0 && target >= 0) {
             labels.push(nome);
             targets.push(target);
             data.push(attuale);
@@ -171,9 +178,12 @@ function generaGrafico(liqAttualePerc) {
     })
 }
 
+function bilanciaAssets() {}
+
 fetch('load.php')
   .then(res => res.text())
   .then(html => {
     document.getElementById('titoli').innerHTML = html;
-    aggiornaPrezzi();
+    aggiornaPrezzi('tab-portafoglio');
+    bilanciaAssets();
   });

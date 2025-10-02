@@ -5,26 +5,28 @@
   <informazioni tolleranza="5" ultimoAggiornamento="2025-09-08" commissione="5"/>
 
   <assets>
-    <azione ticker="AAPL" valuta="USD">
-      <nome>Apple</nome>
+    
       <target>30</target>
-      <operazioni>
-        <operazione valuta="USD">
-          <data>2024-05-01</data>
-          <quantita>9</quantita>
-          <prezzo>160</prezzo>
-        </operazione>
-        <operazione valuta="USD">
-          <data>2024-06-01</data>
-          <quantita>2</quantita>
-          <prezzo>170</prezzo>
-        </operazione>
-      </operazioni>
-    </azione>
+      <azione ticker="AAPL" valuta="USD">
+        <nome>Apple</nome>
+        <target>30</target>
+        <operazioni>
+          <operazione valuta="USD">
+            <data>2024-05-01</data>
+            <quantita>9</quantita>
+            <prezzo>160</prezzo>
+          </operazione>
+          <operazione valuta="USD">
+            <data>2024-06-01</data>
+            <quantita>2</quantita>
+            <prezzo>170</prezzo>
+          </operazione>
+        </operazioni>
+      </azione>
 
     <azione ticker="GOOGL" valuta="USD">
       <nome>Google</nome>
-      <target>45</target>
+      <target>70</target>
       <operazioni>
         <operazione valuta="USD">
           <data>2024-06-15</data>
