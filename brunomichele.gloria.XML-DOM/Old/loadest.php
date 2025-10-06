@@ -21,7 +21,7 @@ function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, f
     global $DBG; // DEBUG
     file_put_contents($DBG, "[renderChildren] parent=".$parent->nodeName."\n", FILE_APPEND); // DEBUG
     $children = $xp->query('azione | etf | obbligazione | bucket', $parent);
-    $items = [];
+    $html = '';
     $sum = 0.0;
 
     foreach ($children as $child) {
@@ -30,44 +30,38 @@ function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, f
         $targetNode = $xp->query('target', $child)->item(0);
         $name      = $nameNode   ? trim($nameNode->textContent)   : 'Bucket';
         $targetRaw = $targetNode ? trim($targetNode->textContent) : '';
-        $included = $targetRaw !== ''? true : false;
 
         if ($type === 'bucket') {
             // ========= BUCKET =========
             [$innerHtml, $innerSum] = renderChildren($child, $xp, $getPrice, 0.00, false);
-            if ($included) $sum += $innerSum;
+            $sum += $innerSum;
 
-            $items[] = [
-                'type' => 'bucket',
-                'value' => $innerSum,
-                'included' => $included,
-                'rowOpen' => '<tr data-type="bucket" class="bucket-row" '
-                        .  'data-target-raw="' . htmlspecialchars($targetRaw) . '" '
-                        .  'data-valore="'     . htmlspecialchars(number_format($innerSum, 6, '.', '')) . '">'
-                        .    '<td class="tipo">bucket</td>'
-                        .    '<td class="nome">' . htmlspecialchars($name) . '</td>'
-                        .    '<td class="quantita">-</td>'
-                        .    '<td class="prezzo">-</td>'
-                        .    '<td class="valore">' . htmlspecialchars(number_format($innerSum, 2, ',', '.')) . '</td>'
-                        .    '<td class="attuale">',
-                'rowClose' => '</td>'
-                        .    '<td class="target">' . ($targetRaw === '' ? '-' : htmlspecialchars($targetRaw)) . '</td>'
-                        .    '<td class="delta-qty">-</td>'
-                        .  '</tr>'
-                        // Riga dettagli con sub-tabella, inizialmente nascosta
-                        .  '<tr class="bucket-details" style="display:none">'
-                        .    '<td colspan="8"><table class="bucket-table"><tbody>'
-                        .      $innerHtml
-                        .    '</tbody></table></td>'
-                        .  '</tr>'
-            ];
-        
+            $html .= '<tr data-type="bucket" class="bucket-row" '
+                  .  'data-target-raw="' . htmlspecialchars($targetRaw) . '" '
+                  .  'data-valore="'     . htmlspecialchars(number_format($innerSum, 6, '.', '')) . '">';
+            $html .= 	'<td class="tipo">bucket</td>';
+            $html .= 	'<td class="nome">' . htmlspecialchars($name) . '</td>';
+            $html .= 	'<td class="quantita">-</td>';
+            $html .= 	'<td class="prezzo">-</td>';
+            $html .= 	'<td class="valore">' . htmlspecialchars(number_format($innerSum, 2, ',', '.')) . '</td>';
+            $html .= 	'<td class="attuale">-</td>';
+            $html .= 	'<td class="target">' . ($targetRaw === '' ? '-' : htmlspecialchars($targetRaw)) . '</td>';
+            $html .= 	'<td class="delta-qty">-</td>';
+            $html .= '</tr>';
+
+            // Riga dettagli con sub-tabella, inizialmente nascosta
+            $html .= '<tr class="bucket-details" style="display:none">';
+            $html .= 	'<td colspan="8"><table class="bucket-table"><tbody>';
+            $html .= 	$innerHtml;
+            $html .= 	'</tbody></table></td>';
+            $html .= '</tr>';
+
         } else if (in_array($type, ['azione', 'etf', 'obbligazione'])) {
             // ========= ASSET =========
 
             $ticker     = $child->getAttribute('ticker');
             $nameNode   = $xp->query('nome',   $child)->item(0);
-            $targetNode = $xp->query('target', $child)->item(0); // DOPPIONI OVUNQUE
+            $targetNode = $xp->query('target', $child)->item(0);
             $name       = $nameNode   ? trim($nameNode->textContent)   : $ticker;
             $targetRaw  = $targetNode ? trim($targetNode->textContent) : '';
 
@@ -76,6 +70,8 @@ function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, f
             foreach ($xp->query('operazioni/operazione/quantita', $child) as $q) {
                 $qty += toFloat($q->textContent);
             }
+            $ticker = $child->getAttribute('ticker'); //DEBUG
+            file_put_contents($DBG, "[asset] type=$type ticker=".($ticker ?: 'NULL')."\n", FILE_APPEND); // DEBUG
 
             // WAC (solo acquisti; vendite non lo aggiornano)
             $avgCost = 0.0;
@@ -95,50 +91,39 @@ function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, f
             }
             $quoted = $getPrice($ticker, $type);
             $unitPrice = (is_numeric($quoted) ? (float)$quoted : 0.0);
+             file_put_contents($DBG, "[asset] unitPrice=$unitPrice ticker=".($ticker ?: 'NULL')."\n", FILE_APPEND); // DEBUG
 
             $value = ($type === 'obbligazione') ? $qty * $unitPrice / 100 : $qty * $unitPrice;
-            if ($included) $sum += $value;
+            $sum += $value;
 
             $taxRateRow = $child->hasAttribute('taxRate') ? $child->getAttribute('taxRate') : '0.26';
             $tradeStep  = $child->hasAttribute('tradeStep') ? (int)$child->getAttribute('tradeStep') : 0;
 
-
-
-            $items[] = [
-                'type' => $type,
-                'value' => $value,
-                'included' => $included,
-                'rowOpen' => '<tr data-type="' . htmlspecialchars($type) . '"'
-                        .  ' data-ticker="' . htmlspecialchars($ticker) . '"'
-                        .  ' data-quantita="' . htmlspecialchars($qty) . '"'
-                        .  ' data-costo="' . htmlspecialchars(number_format($avgCost, 6, '.', '')) . '"'
-                        .  ' data-taxrate-asset="' . htmlspecialchars($taxRateRow) . '"'
-                        .  ' data-tradestep="' . htmlspecialchars($tradeStep) . '"'
-                        .  ' data-prezzo="' . htmlspecialchars(number_format($unitPrice, 6, '.', '')) . '"'
-                        .  ' data-valore="' . htmlspecialchars(number_format($value, 6, '.', '')) . '"'
-                        .  ' data-target-raw="' . htmlspecialchars($targetRaw) . '">'
-                            .    '<td class="tipo">' . htmlspecialchars($type) . '</td>'
-                            .    '<td class="nome">' . htmlspecialchars($name) . '</td>'
-                            .    '<td class="quantita">' . htmlspecialchars($qty) . '</td>'
-                            .    '<td class="prezzo">' . ($unitPrice > 0 ? htmlspecialchars(number_format($unitPrice, 2, ',', '.')) : '-') . '</td>'
-                            .    '<td class="valore">' . ($value > 0 ? htmlspecialchars(number_format($value, 2, ',', '.')) : '-') . '</td>'
-                            .    '<td class="attuale">',
-                'rowClose' =>   '</td>'
-                            .    '<td class="target">' . ($targetRaw === '' ? '-' : htmlspecialchars($targetRaw)) . '</td>'
-                            .    '<td class="delta-qty">-</td>'
-                        .  '</tr>'
-            ];
-
+            $html .= '<tr data-type="' . htmlspecialchars($type) . '"'
+                .  ' data-ticker="' . htmlspecialchars($ticker) . '"'
+                .  ' data-quantita="' . htmlspecialchars($qty) . '"'
+                .  ' data-costo="' . htmlspecialchars(number_format($avgCost, 6, '.', '')) . '"'
+                .  ' data-taxrate-asset="' . htmlspecialchars($taxRateRow) . '"'
+                .  ' data-tradestep="' . htmlspecialchars($tradeStep) . '"'
+                .  ' data-prezzo="' . htmlspecialchars(number_format($unitPrice, 6, '.', '')) . '"'
+                .  ' data-valore="' . htmlspecialchars(number_format($value, 6, '.', '')) . '"'
+                .  ' data-target-raw="' . htmlspecialchars($targetRaw) . '">';
+            $html .=   '<td class="tipo">' . htmlspecialchars($type) . '</td>';
+            $html .=   '<td class="nome">' . htmlspecialchars($name) . '</td>';
+            $html .=   '<td class="quantita">' . htmlspecialchars($qty) . '</td>';
+            $html .=   '<td class="prezzo">' . ($unitPrice > 0 ? htmlspecialchars(number_format($unitPrice, 2, ',', '.')) : '-') . '</td>';
+            $html .=   '<td class="valore">' . ($value > 0 ? htmlspecialchars(number_format($value, 2, ',', '.')) : '-') . '</td>';
+            $html .=   '<td class="attuale">-</td>';
+            $html .=   '<td class="target">' . ($targetRaw === '' ? '-' : htmlspecialchars($targetRaw)) . '</td>';
+            $html .=   '<td class="delta-qty">-</td>';
+            $html .= '</tr>';
         }
     }
+	
+	foreach ($children as $child) {
+		
+	}
 
-    //=== costruzione html ===
-    $html = '';
-    $denom = $sum + $liquidita;
-    foreach ($items as $it) {
-        $att = ($it['included'] && $denom > 0) ? number_format($it['value'] / $denom * 100, 2, ',', '.') : '-';
-        $html .= $it['rowOpen'] . $att . $it['rowClose'];
-    }
     return [$html, $sum];
 }
 

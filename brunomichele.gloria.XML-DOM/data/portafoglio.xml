@@ -5,8 +5,6 @@
   <informazioni tolleranza="5" ultimoAggiornamento="2025-09-08" commissione="5"/>
 
   <assets>
-    
-      <target>30</target>
       <azione ticker="AAPL" valuta="USD">
         <nome>Apple</nome>
         <target>30</target>
@@ -26,7 +24,7 @@
 
     <azione ticker="GOOGL" valuta="USD">
       <nome>Google</nome>
-      <target>70</target>
+      <target>45</target>
       <operazioni>
         <operazione valuta="USD">
           <data>2024-06-15</data>
@@ -36,7 +34,7 @@
       </operazioni>
     </azione>
 
-    <!--<obbligazione ticker="IT0005532723" valuta="EUR" taxRate="12.5">
+    <obbligazione ticker="IT0005532723" valuta="EUR" taxRate="12.5">
       <nome>Btp Italia Mz28 Eur</nome>
       <target>25</target>
       <operazioni>
@@ -49,7 +47,7 @@
       <cedola>2,00 (indicizzato)</cedola>
       <frequenza_cedola>Semestrale</frequenza_cedola>
       <scadenza>2028-03-14</scadenza>
-    </obbligazione>-->
+    </obbligazione>
   </assets>
 
   <liquidita valuta="EUR">
