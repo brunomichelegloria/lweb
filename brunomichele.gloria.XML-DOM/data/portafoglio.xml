@@ -1,58 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE portafoglio SYSTEM "portafoglio.dtd">
 <portafoglio valuta="EUR">
-  
-  <informazioni tolleranza="5" ultimoAggiornamento="2025-09-08" commissione="5"/>
 
-  <assets>
-      <azione ticker="AAPL" valuta="USD">
-        <nome>Apple</nome>
-        <target>30</target>
-        <operazioni>
-          <operazione valuta="USD">
-            <data>2024-05-01</data>
-            <quantita>9</quantita>
-            <prezzo>160</prezzo>
-          </operazione>
-          <operazione valuta="USD">
-            <data>2024-06-01</data>
-            <quantita>2</quantita>
-            <prezzo>170</prezzo>
-          </operazione>
-        </operazioni>
-      </azione>
+	<informazioni tolleranza="5" ultimoAggiornamento="2025-09-08" commissione="5"/>
 
-    <azione ticker="GOOGL" valuta="USD">
-      <nome>Google</nome>
-      <target>45</target>
-      <operazioni>
-        <operazione valuta="USD">
-          <data>2024-06-15</data>
-          <quantita>17</quantita>
-          <prezzo>120</prezzo>
-        </operazione>
-      </operazioni>
-    </azione>
+	<assets>
+		<bucket tradeStep="1">
+			<nome>Tech Giants</nome>
+			<target>75</target>
+			<azione ticker="AAPL" valuta="USD">
+				<nome>Apple</nome>
+				<target>40</target>
+				<operazioni>
+					<operazione valuta="USD">
+						<data>2024-05-01</data>
+						<quantita>9</quantita>
+						<prezzo>160</prezzo>
+					</operazione>
+					<operazione valuta="USD">
+						<data>2024-06-01</data>
+						<quantita>2</quantita>
+						<prezzo>170</prezzo>
+					</operazione>
+				</operazioni>
+			</azione>
 
-    <obbligazione ticker="IT0005532723" valuta="EUR" taxRate="12.5">
-      <nome>Btp Italia Mz28 Eur</nome>
-      <target>25</target>
-      <operazioni>
-        <operazione valuta="EUR">
-          <data>2025-09-10</data>
-          <quantita>2000</quantita>
-          <prezzo>101,16062</prezzo>
-        </operazione>
-      </operazioni>
-      <cedola>2,00 (indicizzato)</cedola>
-      <frequenza_cedola>Semestrale</frequenza_cedola>
-      <scadenza>2028-03-14</scadenza>
-    </obbligazione>
-  </assets>
+			<azione ticker="GOOGL" valuta="USD">
+				<nome>Google</nome>
+				<target>60</target>
+				<operazioni>
+					<operazione valuta="USD">
+						<data>2024-06-15</data>
+						<quantita>17</quantita>
+						<prezzo>120</prezzo>
+					</operazione>
+				</operazioni>
+			</azione>
+		</bucket>
 
-  <liquidita valuta="EUR">
-    <totale>300</totale>
-    <target>0</target>
-  </liquidita>
+		<obbligazione ticker="IT0005532723" valuta="EUR" taxRate="12.5">
+			<nome>Btp Italia Mz28 Eur</nome>
+			<target>25</target>
+			<operazioni>
+				<operazione valuta="EUR">
+					<data>2025-09-10</data>
+					<quantita>2000</quantita>
+					<prezzo>101.16062</prezzo>
+				</operazione>
+			</operazioni>
+			<cedola>2,00 (indicizzato)</cedola>
+			<frequenza_cedola>Semestrale</frequenza_cedola>
+			<scadenza>2028-03-14</scadenza>
+		</obbligazione>
+	</assets>
+
+	<liquidita valuta="EUR">
+		<totale>300</totale>
+		<target>0</target>
+	</liquidita>
 
 </portafoglio>

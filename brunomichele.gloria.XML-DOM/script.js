@@ -1,5 +1,5 @@
 function generaGrafico(liqAttualePerc) {
-    const righe = document.querySelectorAll('table tr[data-type]');
+    const righe = document.querySelectorAll('#tab-portafoglio > tbody > tr[data-type]');
     const labels = [];
     const targets = [];
     const data = [];
@@ -10,8 +10,8 @@ function generaGrafico(liqAttualePerc) {
 
     righe.forEach(riga => {
         const nome = riga.querySelector('.nome').textContent;
-        const attuale = parseFloat(riga.querySelector('.attuale').textContent);
-        const target = parseFloat(riga.querySelector('.target').textContent);
+        const attuale = parseFloat(riga.querySelector('.attuale').textContent.replace(',', '.'));
+        const target = parseFloat(riga.querySelector('.target').textContent.replace(',', '.'));
         if (attuale > 0 && target >= 0) {
             labels.push(nome);
             targets.push(target);
