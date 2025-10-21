@@ -40,7 +40,7 @@ function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, f
 
         if ($type === 'bucket') {
             // ========= BUCKET =========
-            $childPath = $parentPath . '/' . $name;
+            $childPath = $parentPath . '/' . sanitize_id($name);
             $colore = (substr_count($childPath, '/') % 2 === 0) ? 'bucket-details-even' : 'bucket-details-odd';
             [$innerHtml, $innerSum] = renderChildren($child, $xp, $getPrice, 0.00, $childPath);
             if ($included) $sum += $innerSum;
@@ -124,7 +124,7 @@ function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, f
                         .  ' data-tradestep="' . htmlspecialchars($tradeStep) . '"'
                         .  ' data-prezzo="' . htmlspecialchars(number_format($unitPrice, 6, '.', '')) . '"'
                         .  ' data-target-raw="' . htmlspecialchars($targetRaw) . '">'
-                            .   '<td class="edit-cell"><button type="button" id="' . sanitize_id(htmlspecialchars($childPath)) . '-button" class="edit-button">⚙️</button></td>' //ID potenzialmente NON univoco
+                            .   '<td class="edit-cell"><button type="button" id="' . sanitize_id(htmlspecialchars($childPath)) . '-button" class="edit-button" data-role="ops-gear">⚙️</button></td>' //ID potenzialmente NON univoco
                                                                 //SOLUZIONE TEMPORANEA ⬆️
                             .    '<td class="tipo">' . htmlspecialchars($type) . '</td>'
                             .    '<td class="nome">' . htmlspecialchars($name) . '</td>'

@@ -6,7 +6,7 @@
 
 	<assets>
 		<bucket tradeStep="1">
-			<nome>Tech Giants</nome>
+			<nome>Tech-Giants</nome>
 			<target>75</target>
 			<azione ticker="AAPL" valuta="USD">
 				<nome>Apple</nome>
@@ -41,6 +41,9 @@
 		<obbligazione ticker="IT0005532723" valuta="EUR" taxRate="12.5">
 			<nome>Btp Italia Mz28 Eur</nome>
 			<target>25</target>
+			<cedola>2,00 (indicizzato)</cedola>
+			<frequenza_cedola>Semestrale</frequenza_cedola>
+			<scadenza>2028-03-14</scadenza>
 			<operazioni>
 				<operazione valuta="EUR">
 					<data>2025-09-10</data>
@@ -48,9 +51,6 @@
 					<prezzo>101.16062</prezzo>
 				</operazione>
 			</operazioni>
-			<cedola>2,00 (indicizzato)</cedola>
-			<frequenza_cedola>Semestrale</frequenza_cedola>
-			<scadenza>2028-03-14</scadenza>
 		</obbligazione>
 	</assets>
 

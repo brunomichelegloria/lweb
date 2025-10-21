@@ -31,7 +31,7 @@
     <!ELEMENT assets (obbligazione | azione | etf | bucket)*>
 
         <!-- OBBLIGAZIONE -->
-        <!ELEMENT obbligazione (nome?, target?, operazioni, cedola?, frequenza_cedola?, scadenza?)>
+        <!ELEMENT obbligazione (nome?, target?, cedola?, frequenza_cedola?, scadenza?, operazioni)>
         <!ATTLIST obbligazione
             ticker CDATA #REQUIRED
             valuta CDATA "EUR"

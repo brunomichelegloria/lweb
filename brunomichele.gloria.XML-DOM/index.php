@@ -19,47 +19,39 @@
             <canvas id="graph" width="400" height="400"></canvas>
         </div>
 
-        <div id="ops-popover" class="ops-popover">
+        <div id="ops-popover">
             <div class="ops-switch">
-                <button type="button" id="ops-buy" class="active">Compra</button> <!-- Sostituire i due bottoni con lo switch del
-                                                                                 progetto spiaggia/modificheSpiaggia/#modeSwitch --->
-                <button type="button" id="ops-sell">Vendi</button>
+                <span id="modeLabel">Acquisto</span>
+                <label class="switch">
+                    <input type="checkbox" id="modeSwitch">
+                    <span class="slider"></span>
+                </label>
             </div>
-            <div class="ops-row">
-                <label>Quantità</label>
-                <input id="ops-qty" class="ops-input" type="number" min="1" step="1">
-            </div>
-            <div class="ops-row" id="ops-price-row">
-                <label>Prezzo</label>
-                <input id="ops-price" class="ops-input" type="number" step="0.000001" placeholder="0.000000">
-            </div>
-            <div id="ops-hint"></div>
-            <div class="ops-errors" id="ops-errors"></div>
-            <div class="ops-actions">
-                <button type="button" class="ops-btn" id="ops-submit">Invia</button>
-                <button type="button" class="ops-btn secondary" id="ops-close">Chiudi</button>
-            </div>
-            <div class="ops-actions">
-                <button type="button" class="ops-btn secondary" id="ops-cumulate">Cumula</button>
-            </div>
+            <form id="ops-form" action="lib/addOps.php" method="POST">
+                <input type="hidden" name="path" id="op-path" value="">
+                <input type="hidden" name="type" id="op-type" value="buy">
+                <div class="ops-row">
+                    <label>Quantità</label>
+                    <input id="op-qty" name="qty" type="number" min="1" step="1">
+                </div>
+                <div class="ops-row" id="ops-price-row">
+                    <label>Prezzo</label>
+                    <input id="op-price" class="ops-input" type="number" step="0.000001" placeholder="0.000000">
+                </div>
+                <div id="ops-hint"></div>
+                <div class="ops-actions">
+                    <button type="submit" class="ops-btn" id="ops-submit">Invia</button>
+                </div>
+            </form>
         </div>
+        <div class="ops-errors" id="ops-errors"></div>
     </body>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             generaGrafico(parseFloat(document.getElementById('liquidita-totale')?.dataset.liqattuale.replace(',', '.') || 0));
 
-
-            document.querySelectorAll('.toggle-details-button').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    this.classList.toggle('rotate-90');
-
-                    const detailsRow = this.closest('tr').nextElementSibling;
-                    if (detailsRow && detailsRow.classList.contains('bucket-details')) {
-                        detailsRow.style.display = detailsRow.style.display === 'table-row' ? 'none' : 'table-row';
-                    }
-                });
-            });
+            setupEventListeners();
         });
     </script>
 
