@@ -1,14 +1,5 @@
 <?php
-function getPriceBondInvesting(string $isin): float{
-
-    $isin = preg_replace('/[^A-Za-z0-9]/', '', $isin); //Sanifica ISIN
-    if ($isin === '' || strlen($isin) < 10) return -1.00;
-
-
-    $search_url = "https://it.investing.com/search/?q=" . urlencode($isin);
-    $headers = ["User-Agent: Mozilla/5.0"];
-
-    function getHtml($url, $headers) {
+function getHtml($url, $headers) {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -18,6 +9,17 @@ function getPriceBondInvesting(string $isin): float{
         curl_close($ch);
         return $html;
     }
+
+function getPriceBondInvesting(string $isin): float{
+
+    $isin = preg_replace('/[^A-Za-z0-9]/', '', $isin); //Sanifica ISIN
+    if ($isin === '' || strlen($isin) < 10) return -1.00;
+
+
+    $search_url = "https://it.investing.com/search/?q=" . urlencode($isin);
+    $headers = ["User-Agent: Mozilla/5.0"];
+
+    
 
     //Cerca la pagina
     $search_html = getHtml($search_url, $headers);

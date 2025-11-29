@@ -1,0 +1,33 @@
+:root { --bg:#0b0d10; --panel:#12161b; --muted:#9aa4ad; --fg:#eaf0f4; --accent:#69c; --ok:#3cc86b; --danger:#ff6b6b; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,Segoe UI,Roboto,Arial}
+header{padding:16px 20px;border-bottom:1px solid #1f252c;background:var(--panel);position:sticky;top:0; z-index:10}
+.crumbs a{color:var(--muted);text-decoration:none;margin-right:6px}
+.crumbs span.sep{opacity:.5;margin:0 6px}
+main{max-width:980px;margin:24px auto;padding:0 16px}
+.card{background:var(--panel);border:1px solid #1f252c;border-radius:14px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+.toolbar{display:flex;gap:8px;align-items:center;padding:12px 14px;border-bottom:1px solid #1f252c}
+.toolbar .note{margin-left:auto;color:var(--muted);font-size:12px}
+table{width:100%;border-collapse:separate;border-spacing:0}
+th,td{width:auto; height: 7vh; padding:12px 14px;border-bottom:1px solid #1f252c;}
+th{font-weight:600;color:var(--muted);text-align:left}
+tr{justify-content: space-between;}
+tr:hover td{background:#161b22}
+.name{display:flex;align-items:center;gap:10px}
+.tag{font-size:12px;color:#a5d6ff;border:1px solid #1f3b57;padding:2px 8px;border-radius:999px}
+.btn{border:0;border-radius:10px;padding:8px 12px;background:#1d2833;color:var(--fg);cursor:pointer}
+.btn:hover{background:#243140}
+.btn-ok{background:var(--ok);color:#001c09;font-weight:600}
+.btn-ok:hover{filter:brightness(1.05)}
+.btn-ghost{background:transparent;border:1px solid #2a3642}
+.btn-ghost:hover{background:#18212a}
+.input-inline{background:#0f1318;border:1px solid #2a3642;border-radius:10px;padding:6px 8px;color:var(--fg)}
+.icon{width:18px;height:18px; justify-content: center; align-items: center; display: inline-flex;}
+.icon.folder{background:#4b89dc;border-radius:3px}
+.icon.file{background:#64748b;border-radius:3px;}
+.icon.file::after{content:'';position:absolute;right:2px;top:2px;width:6px;height:6px;background:#cbd5e1;border-radius:1px}
+.flash{padding:12px 14px}
+.flash.error{color:#ffb4b4;background:#3a1111}
+footer{padding:12px 16px;color:var(--muted)}
+
+/* Scusi prof, non mi andava di fare un altro file di stile. Ci ha pensato chatgpt ed ho solo inserito qualche correzione */

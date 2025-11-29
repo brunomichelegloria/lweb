@@ -1,22 +1,67 @@
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
 body {
+	height: 100%;
+    min-height: 100%;
+	width: 100%;
+	max-width: 100%;
+    margin: 0;
+    padding: 0;
+	overflow-x: hidden;
+	background-color: #ccc;
+    background-image: linear-gradient(
+        to bottom,
+        #ccc 0%,
+        #ccc 50%,
+        #1f1f1f 50%,
+        #1f1f1f 100%
+    );
+	background-attachment: fixed;
+	background-repeat: no-repeat;
+}
+
+header {
+	padding: 16px 20px;
+	border-bottom: 1px solid #1f252c;
+	background: #ccc;
+	position: sticky;
+	top: 0;
+	width: 100%;
+	z-index: 10;
+}
+
+#page {
     display: flex;
     flex-direction: column;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: auto;
     font-family: sans-serif;
-    background-color:rgb(31, 31, 31);
     color: #fff;
+    background-color:rgb(31, 31, 31);
     padding: 5vw;
+    margin: 0;
+}
+
+p {
+    opacity: 0.5;
+    margin-top: 0;
+    padding-top: 0;
 }
 
 #tabella-e-grafico {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+	width: 100%;
 }
 
 th, td {
     border: 0.1vw solid #ccc;
-    padding: 1vw;
+    padding: 1vw 0.5vw;
+    max-width: 20vw;
     text-align: center;
 }
 
@@ -132,9 +177,140 @@ tr.bucket-details-even > td {
 	transition: 0.4s;
 	border-radius: 50%;
 }
-input:checked + .slider {
+.switch input:checked + .slider {
 	background-color: red;
 }
-input:checked + .slider:before {
+.switch input:checked + .slider:before {
 	transform: translateX(2vw);
 }
+
+.ops-forms-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	max-width: 50%;
+}
+
+.helper-form {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	margin-top: 2vh;
+	margin-bottom: 2vh;
+	padding: 0 5vh;
+}
+
+#cumulBox{
+    flex-direction: row;
+}
+#cumul-btn {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.help-btn{
+    border-radius: 100%;
+    border: none;
+}
+
+.help-text {
+    opacity: 0;
+    margin-top: 1vh;
+}
+
+.ops-errors {
+    position: relative;
+    color: red;
+    font-size: 200%;
+    left: 30vw;
+    top: 10vh;
+}
+
+
+/* Il contenitore <dialog> non deve avere padding/bordi suoi */
+#asset-dialog {
+  padding: 0;
+  border: none;            /* togli il bordo UA */
+  border-radius: 12px;
+}
+
+/* Sfondo scuro dietro la finestra */
+#asset-dialog::backdrop {
+  background: rgba(0,0,0,.35);
+}
+
+/* Il FORM funge da “cornice” della finestra */
+#asset-form {
+  /* DIMENSIONI FISSE (con limiti responsivi) */
+  width: 900px;            /* fisso desktop */
+  max-width: 92vw;         /* non uscire dal viewport */
+  height: 68vh;            /* finestra “fissa” in altezza */
+  max-height: 720px;       /* tetto in px se preferisci */
+  
+  /* Cornice + estetica */
+  background: rgb(31, 31, 31);
+  border: 2px solid #d0d7de;      /* la cornice */
+  border-radius: 12px;
+  box-shadow: 0 22px 60px rgba(0,0,0,.25);
+  overflow: hidden;                /* clip angoli arrotondati */
+  color: #ccc;
+
+  /* Layout per tenere il footer in basso */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Area scorrevole con gli asset */
+#asset-form .dialog-body {
+  flex: 1 1 auto;          /* occupa tutto lo spazio disponibile */
+  min-height: 0;           /* importante per Safari/Edge, abilita lo scroll interno */
+  overflow: auto;          /* solo questa parte scorre */
+  padding: 16px;
+}
+
+/* Footer fisso in basso alla cornice (non scorre) */
+#asset-form .dialog-footer {
+  flex: 0 0 auto;          /* dimensione “intrinseca”, resta in basso */
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between; /* left e right ai lati */
+  padding: 12px 16px;
+  border-top: 1px solid #e5e7eb;
+  background: #ccc;
+}
+
+/* (opzionale) colonne nel body: ogni asset separato bene */
+#asset-form .asset-field { 
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+}
+.asset-field input, .asset-field select {
+    margin: .5vh 1vw;
+}
+.asset-field label {
+  word-break: keep-all;   /* non spezzare le parole */
+  hyphens: manual;        /* usa solo trattini inseriti dall’autore, no auto */
+}
+#asset-form hr {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 12px 0;
+}
+
+
+/* Mobile: la finestra si adatta senza uscire dallo schermo */
+@media (max-width: 600px) {
+  #asset-form {
+    width: calc(100vw - 24px);
+    height: 85vh;
+    border-width: 1px;
+    border-radius: 10px;
+  }
+}
+
+html:has(#asset-dialog[open]),
+body:has(#asset-dialog[open]) { overflow: hidden; }

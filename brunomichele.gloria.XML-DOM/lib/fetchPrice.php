@@ -21,7 +21,7 @@ function getPriceYahoo(string $ticker): float {
         $price = floatval($data['chart']['result'][0]['meta']['regularMarketPrice']);
         return $price;
     }
-    return null;
+    return 0.00;
 }
 if (!debug_backtrace()) {
     header('Content-Type: application/json; charset=utf-8');

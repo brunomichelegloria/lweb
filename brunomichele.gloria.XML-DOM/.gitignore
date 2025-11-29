@@ -2,3 +2,4 @@ debug*.html
 data/GB.xml
 log_*.txt
 *.log
+*.bak

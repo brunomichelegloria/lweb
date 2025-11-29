@@ -27,67 +27,20 @@ This software is provided “as is”, **without any warranty of any kind**, exp
 No license. This is a private academic project.  
 **Not intended for reuse or redistribution.**
 
+NOTE:
+  -Autore: Bruno Michele Gloria
 
+  -Esercizi di riferimento: Nuovamente mi scuso per non avere degli espliciti esercizi a cui ho fatto riferimento. Ho semplicemente cercato di usare gli strumenti mostrati a lezione e nelle slide, per poi imparare nuovi strumenti quando necessario.
 
-// === (Δ)Qty: arrotondamento GLOBALE budget-neutral + conformità post-trade ===
-{
-  const tab = document.getElementById('tab-portafoglio');
-  const tolStr = tab?.dataset.tolleranza;
-  const tol = (tolStr !== undefined && tolStr !== '') ? parseFloat(tolStr) : NaN;
+  -Principi utilizzati: In questo progetto l’obiettivo era dimostrare l’utilizzo del modello DOM (Document Object Model) per la manipolazione di un file XML contenente dati strutturati.
+  Ho sviluppato un’applicazione per la gestione e il ribilanciamento di un portafoglio finanziario, così da poter applicare in modo variegato le operazioni di lettura, modifica e salvataggio di dati XML.
+  Il file XML è validato tramite DTD, mentre il DOM è stato utilizzato sia in PHP, per elaborare e aggiornare il file, sia in JavaScript, per leggere e interagire con la pagina HTML generata dinamicamente dal server.
 
-  const rows = Array.from(document.querySelectorAll('table tbody tr[data-ticker]'));
-  const p = rows.map(r => parseFloat(r.dataset.prezzo || '0'));
-  const v = rows.map(r => parseFloat(r.dataset.valore || '0'));
-  const wT = rows.map(r => parseFloat(r.querySelector('.target')?.textContent || '0') / 100);
+  -Path richiesto dai file: Se non ho commesso errori dovrebbe bastare spostare la cartella dell'homework all'interno di una qualsiasi locazione del localhost. Ho provato a renderlo indipendente dal path usando le variabili globali di sistema. D'altra parte, non so come testare efficacemente la correttezza senza provare su un altro dispositivo.
 
-  const V = v.reduce((a,b)=>a+(isFinite(b)?b:0),0);
-  // delta continuo per asset
-  const dStar = rows.map((_,i) => (p[i] > 0 ? (wT[i]*V - v[i]) / p[i] : 0));
-
-  // base: floor su tutti per evitare overspend
-  const base = dStar.map(d => Math.floor(d));
-
-  // residuo in valore da distribuire
-  let residual = dStar.reduce((acc, d, i) => acc + (d - base[i]) * p[i], 0);
-
-  // largest remainders: ordina per parte frazionaria decrescente
-  const frac = dStar.map((d,i) => d - base[i]); // in [0,1)
-  const order = [...frac.keys()].sort((i,j) => frac[j] - frac[i]);
-
-  const minPrice = Math.min(...p.filter(x => isFinite(x) && x > 0));
-  for (const i of order) {
-    if (!(isFinite(p[i]) && p[i] > 0)) continue;
-    if (frac[i] <= 0) continue;
-    if (residual + 1e-9 < p[i]) continue;
-    base[i] += 1;              // compra +1 (o riduci una vendita eccessiva)
-    residual -= p[i];
-  }
-
-  // simulazione post-trade
-  const vPrime = v.map((vi,i) => vi + base[i]*p[i]);
-  const Vprime = vPrime.reduce((a,b)=>a+(isFinite(b)?b:0),0);
-
-  rows.forEach((r,i) => {
-    const deltaCell = r.querySelector('.delta-qty');
-    if (!deltaCell) return;
-
-    // tolleranza mancante -> mostra solo "–" attenuato
-    if (!isFinite(tol)) {
-      deltaCell.textContent = '-';
-      deltaCell.classList.remove('ok','ko');
-      deltaCell.style.opacity = '0.7';
-      return;
-    }
-
-    const targetPct = wT[i]*100;
-    const percPrime = Vprime > 0 ? (vPrime[i]/Vprime)*100 : 0;
-    const within = Math.abs(percPrime - targetPct) <= tol;
-
-    const k = base[i]; // delta intero definitivo
-    const kStr = `${k >= 0 ? '+' : ''}${k}`;
-    deltaCell.textContent = `${within ? 'OK' : 'KO'} Δ${kStr}`;
-    deltaCell.classList.toggle('ok', within);
-    deltaCell.classList.toggle('ko', !within);
-    deltaCell.style.opacity = '';
-  });
-}
+  -Funzionalità ed utilizzo: index.php si occupa di gestire un piccolo e limitato filesystem così da rendere possibile visualizzare, aggiungere, rimuovere i file contenenti i portafogli, olre che importare un precedente file di backup generato successivamente ad una qualunque modifica in un portafoglio. Accedendo ad un portafoglio viene inviata la pagina gestionalePortafoglio.php, che fornisce un elenco degli asset in portafoglio ed una piccola analisi del loro stato (la percentuale occupata in portafoglio), mostrata anche tramite grafico a torta. I prezzi degli asset vengono rischiesti a yahooFinance quando possibile, altrimenti viene fatto scraping da alcune pagine (motivo per cui i dati nel file .xml sono limitati, lo scraping comporta dei limiti a cosa posso salvare per ragioni legali); questi prezzi vengono poi salvati in una variabile di sessione così da limitare il numero di chiamate a questi servizi.
+  Le operazioni disponibili sono: aggiunta, rimozione e modifica di asset o bucket (i buckets sono l'equivalente di cartelle di asset) tramite modifyAssets.php, aggiunta di operazioni di acquisto o vendita, e un operazione di cumulazione la quale converte lo storico delle operazioni passate in un'unica operazione dal valore fiscale equivalente tramite addOps.php, il calcolo delle operazioni necessarie al ribilanciamento del portafoglio tramite rebalance.php. Nei primi due file uso DOM per accedere direttamente al file XML, ed eseguire le azioni richieste una alla volta; nell'ultimo ho preferito usare usarlo per leggere l'interità del file e creare un albero con i suoi contenuti.
+  Come richiesto alla consegna del precedente compito ho integrato in questo la parte mancante sull'utilizzo dei form, utilizzando i metodi POST per le operazioni e GET per le comunicazioni tra le pagine.
+  
+  -Github: https://github.com/brunomichelegloria/lweb/tree/main/brunomichele.gloria.XML-DOM
+  

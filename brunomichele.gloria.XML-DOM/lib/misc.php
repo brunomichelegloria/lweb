@@ -51,9 +51,75 @@ function sanitize_id($str) {
     return $str;
 }
 
+function toFloat(?string $s): float {
+    return is_numeric($s) ? (float)$s : 0.0;
+}
+
 function xpathLiteral(string $s): string {
     if (strpos($s, "'") === false) return "'$s'";
     if (strpos($s, '"') === false) return "\"$s\"";
     $parts = explode("'", $s);
     return "concat('" . implode("', \"'\", '", $parts) . "')";
+}
+
+function backupAndSave(DOMDocument $xml, string $selectedPortfolio): string {
+    libxml_use_internal_errors(true);
+
+    if (!$xml->validate()){
+        return 'Errore validazione DOM';
+    }
+
+
+    $final = __DIR__ . '/../data/' . $selectedPortfolio;
+    $tmp   = $final . '.tmp';
+    $bakCrumb = preg_replace('/.xml$/', '', pathinfo($selectedPortfolio, PATHINFO_FILENAME)) . '.';
+    $bak   = __DIR__ . '/../data/backup/' . $bakCrumb . date('Ymd-His') . '.bak';
+
+    if ($xml->save($tmp) === false) return 'Errore salvataggio temp';
+
+    if (!savePretty($tmp)) {
+        unlink($tmp);
+        return 'Errore rettifica';
+    }
+
+    $check = new DOMDocument();
+    if (!$check->load($tmp)) {
+        unlink($tmp);
+        return 'Temp non ben formato';
+    }
+    if (!$check->validate()) {
+        unlink($tmp);
+        return 'Temp non conforme DTD';
+    }
+
+    copy($final, $bak);
+    if (!rename($tmp, $final)) {
+        unlink($tmp);
+        return 'Rename fallito';
+    }
+
+    return '';
+}
+
+function getWAC(DOMElement $asset, DOMXPath $xp): array {
+    $avgCost = 0.0;
+    $qtyCum  = 0.0;
+    foreach ($xp->query('operazioni/operazione', $asset) as $op) {
+        $qNode = $xp->query('quantita', $op)->item(0);
+        $pNode = $xp->query('prezzo',   $op)->item(0);
+        $q  = $qNode ? toFloat($qNode->textContent) : 0.0;
+        $pr = $pNode ? toFloat($pNode->textContent) : 0.0;
+        if ($q > 0) {
+            $avgCost = ($avgCost * $qtyCum + $q * $pr) / ($qtyCum + $q);
+            $qtyCum += $q;
+        } elseif ($q < 0) {
+            $qtyCum += $q;
+        }
+    }
+    return [$avgCost, $qtyCum];
+}
+
+function sendError($page, $msg) {
+    header('Location: ' . $page . '?err=' . $msg, true, 303);
+    exit;
 }

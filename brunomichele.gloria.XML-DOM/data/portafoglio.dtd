@@ -58,8 +58,9 @@
         >
 
         <!-- BUCKET (per raggruppare più asset simili) -->
-        <!ELEMENT bucket (nome, target?, (azione|etf|obbligazione|bucket)+)>
+        <!ELEMENT bucket (nome, target?, (azione|etf|obbligazione|bucket)*)>
         <!ATTLIST bucket
+            valuta CDATA "EUR"
             tradeStep CDATA #IMPLIED
         >
 

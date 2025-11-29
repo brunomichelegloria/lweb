@@ -1,30 +1,19 @@
 <?php
 
 if (!headers_sent()) { header('Content-Type: text/html; charset=utf-8'); }
-require __DIR__.'/lib/fetchPrice.php';
-require __DIR__.'/lib/fetchBondInvesting.php';
-require __DIR__.'/lib/fetchBondBI.php';
+require_once __DIR__.'/lib/fetchPrice.php';
+require_once __DIR__.'/lib/fetchBondInvesting.php';
+require_once __DIR__.'/lib/fetchBondBI.php';
+require_once __DIR__.'/lib/rebalance.php';
+require_once __DIR__.'/lib/misc.php';
+date_default_timezone_set('Europe/Riga');
 
 ini_set('display_errors', '0');                  // niente errori in pagina
 ini_set('log_errors', '1');                      // abilita logging
 ini_set('error_log', __DIR__ . '/php-error.log'); // file di log nel progetto
 error_reporting(E_ALL);
 
-function toFloat(?string $s): float {
-    return is_numeric($s) ? (float)$s : 0.0;
-}
-
-function sanitize_id($str) {
-    // Sostituisci spazi e caratteri non validi con trattino
-    $str = preg_replace('/[^a-zA-Z0-9\-_:.]/', '-', $str);
-    // Rimuovi trattini multipli consecutivi
-    $str = preg_replace('/-+/', '-', $str);
-    // Rimuovi trattini iniziali/finali
-    $str = trim($str, '-');
-    return $str;
-}
-
-function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, float $liquidita, string $parentPath): array {
+function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, float $liquidita, string $parentPath, string $defaultCurrency): array {
     $children = $xp->query('azione | etf | obbligazione | bucket', $parent);
     $items = [];
     $sum = 0.0;
@@ -37,23 +26,44 @@ function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, f
         $name      = $nameNode   ? trim($nameNode->textContent)   : 'Bucket';
         $targetRaw = $targetNode ? trim($targetNode->textContent) : '';
         $included = $targetRaw === ''? false : true;
+		$currency  = $child->hasAttribute('valuta') ? $child->getAttribute('valuta') : $defaultCurrency;
 
         if ($type === 'bucket') {
             // ========= BUCKET =========
             $childPath = $parentPath . '/' . sanitize_id($name);
             $colore = (substr_count($childPath, '/') % 2 === 0) ? 'bucket-details-even' : 'bucket-details-odd';
-            [$innerHtml, $innerSum] = renderChildren($child, $xp, $getPrice, 0.00, $childPath);
+            [$innerHtml, $innerSum] = renderChildren($child, $xp, $getPrice, 0.00, $childPath, $currency);
             if ($included) $sum += $innerSum;
+
+			if (isset($_SESSION['rebalanceReport']['ops'])) {
+				$includedInRebalance = false;
+
+				foreach ($_SESSION['rebalanceReport']['ops'] as $rebalancePath => $rebalanceData) {
+					if (str_contains($rebalancePath, $childPath . '/')) {
+						$includedInRebalance = true;
+						break;
+					}
+				}
+
+				if ($includedInRebalance) {
+					$deltaText = "❌\nCorrezioni necessarie.";
+				} else {
+					$deltaText = '✅';
+				}
+			} else {
+				$deltaText = '-';
+			}
 
             $items[] = [
                 'type' => 'bucket',
                 'value' => $innerSum,
                 'included' => $included,
-                'rowOpen' => '<tr class="bucket-row" '
-                        .  'data-type="bucket" '
-                        .  'data-target-raw="' . htmlspecialchars($targetRaw) . '" ' 
-                        .  'data-path="' . $childPath . '">'
-                        .    '<td class="edit-cell"><button type="button" id="' . sanitize_id(htmlspecialchars($childPath)) . '-button" class="edit-button">⚙️</button></td>' //ID potenzialmente NON univoco
+                'rowOpen' => '<tr class="bucket-row" data-type="bucket" '
+                        .  ' data-nome="' . htmlspecialchars($name) . '"'
+						            .  ' data-valuta="' . htmlspecialchars($currency) . '"'
+                        .  ' data-target-raw="' . htmlspecialchars($targetRaw) . '" ' 
+                        .  ' data-path="' . $childPath . '">'
+                        .    '<td class="edit-cell"><button type="button" id="' . sanitize_id(htmlspecialchars($childPath)) . '-button" class="edit-button" data-open-assets>🛠️</button></td>' //ID potenzialmente NON univoco
                                                                 //SOLUZIONE TEMPORANEA ⬆️
                         .    '<td class="tipo">bucket</td>'
                         .    '<td class="nome">' . htmlspecialchars($name) . '</td>'
@@ -63,8 +73,8 @@ function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, f
                         .    '<td class="attuale">',
                 'rowClose' => '</td>'
                         .    '<td class="target">' . ($targetRaw === '' ? '-' : htmlspecialchars($targetRaw)) . '</td>'
-                        .    '<td class="delta-qty">-</td>'
-                        .    '<td class="toggle-details-cell"><button type="button" class="toggle-details-button">&#9664</button></td>'
+                        .    '<td class="delta-qty">' . htmlspecialchars($deltaText) . '</td>'
+                        .    '<td class="toggle-details-cell"><button type="button" class="toggle-details-button">&#9664;</button></td>'
                         .  '</tr>'
                         . '<tr class="bucket-details ' . $colore . '">'
                         . '<td colspan="9"><table class="bucket-table"><tbody>'
@@ -78,52 +88,63 @@ function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, f
             $ticker     = $child->getAttribute('ticker');
             $childPath = $parentPath . '/' . $ticker;
 
-            // Qty corrente = somma <quantita> (acquisti/vendite)
-            $qty = 0.0;
-            foreach ($xp->query('operazioni/operazione/quantita', $child) as $q) {
-                $qty += toFloat($q->textContent);
-            }
 
-            // WAC (solo acquisti; vendite non lo aggiornano)
-            $avgCost = 0.0;
-            $qtyCum  = 0.0;
-            foreach ($xp->query('operazioni/operazione', $child) as $op) {
-                $qNode = $xp->query('quantita', $op)->item(0);
-                $pNode = $xp->query('prezzo',   $op)->item(0);
-                $q  = $qNode ? toFloat($qNode->textContent) : 0.0;
-                $pr = $pNode ? toFloat($pNode->textContent) : 0.0;
-                if ($q > 0) {
-                    $avgCost = ($avgCost * $qtyCum + $q * $pr) / ($qtyCum + $q);
-                    $qtyCum += $q;
-                } elseif ($q < 0) {
-                    $qtyCum += $q;
-                    if ($qtyCum < 0) $qtyCum = 0;
-                }
-            }
+            // WAC, qty corrente
+            [$avgCost, $qty] = getWAC($child, $xp);
+            
             $quoted = $getPrice($ticker, $type);
             $unitPrice = (is_numeric($quoted) ? (float)$quoted : 0.0);
 
             $value = ($type === 'obbligazione') ? $qty * $unitPrice / 100 : $qty * $unitPrice;
             if ($included) $sum += $value;
 
-            $taxRateRow = $child->hasAttribute('taxRate') ? $child->getAttribute('taxRate') : '0.26';
+            $taxRateRow = $child->hasAttribute('taxRate') ? $child->getAttribute('taxRate') : '26';
             $tradeStep  = $child->hasAttribute('tradeStep') ? (int)$child->getAttribute('tradeStep') : 0;
 
 
+            $obbData = '';
+            if ($type === 'obbligazione') {
+				$cedolaNode = $xp->query('cedola',   $child)->item(0);
+				$fCedolaNode = $xp->query('frequenza_cedola',   $child)->item(0);
+				$scadenzaNode = $xp->query('scadenza',   $child)->item(0);
+				$cedola = $cedolaNode ? $cedolaNode->textContent : '';
+				$fCedola = $fCedolaNode ? $fCedolaNode->textContent : '';
+				$scadenza = $scadenzaNode ? $scadenzaNode->textContent : '';
+				$obbData = ' data-cedola="' . htmlspecialchars($cedola) . '" data-fcedola="' . htmlspecialchars($fCedola) . '" data-scadenza="' . htmlspecialchars($scadenza) . '"';
+            }
+
+			if (isset($_SESSION['rebalanceReport']['ops'])) {
+				[$qtyDelta, $note] = $_SESSION['rebalanceReport']['ops'][$childPath] ?? [0, ''];
+				$qtyDelta = (int)$qtyDelta;
+				if ($qtyDelta > 0) {
+					$deltaText = "❌BUY: " . number_format($qtyDelta, 0, '.', '');
+				} elseif ($qtyDelta < 0) {
+					$deltaText = "❌SELL: " . number_format(-$qtyDelta, 0, '.', '');
+				} else {
+					$deltaText = '✅';
+				}
+				$deltaText .= $note ? "\n(" . trim($note) . ")" : '';
+			} else {
+				$deltaText = '-';
+			}
 
             $items[] = [
                 'type' => $type,
                 'value' => $value,
                 'included' => $included,
-                'rowOpen' => '<tr data-type="' . htmlspecialchars($type) . '"'
+                'rowOpen' => '<tr class="asset-row" data-type="' . htmlspecialchars($type) . '"'
                         .  ' data-path="' . htmlspecialchars($childPath) . '"'
+                        .  ' data-nome="' . htmlspecialchars($name) . '"'
                         .  ' data-ticker="' . htmlspecialchars($ticker) . '"'
                         .  ' data-quantita="' . htmlspecialchars($qty) . '"'
+                        .  ' data-valuta="' . htmlspecialchars($currency) . '"'
                         .  ' data-costo="' . htmlspecialchars(number_format($avgCost, 6, '.', '')) . '"'
-                        .  ' data-taxrate-asset="' . htmlspecialchars($taxRateRow) . '"'
-                        .  ' data-tradestep="' . htmlspecialchars($tradeStep) . '"'
+                        .  ' data-tax-rate="' . htmlspecialchars($taxRateRow) . '"'
+                        .  ' data-trade-step="' . htmlspecialchars($tradeStep) . '"'
                         .  ' data-prezzo="' . htmlspecialchars(number_format($unitPrice, 6, '.', '')) . '"'
-                        .  ' data-target-raw="' . htmlspecialchars($targetRaw) . '">'
+                        .  ' data-target-raw="' . htmlspecialchars($targetRaw) . '"'
+						. ' data-deltatext="' . htmlspecialchars($deltaText) . '"'
+                        . $obbData . '>'
                             .   '<td class="edit-cell"><button type="button" id="' . sanitize_id(htmlspecialchars($childPath)) . '-button" class="edit-button" data-role="ops-gear">⚙️</button></td>' //ID potenzialmente NON univoco
                                                                 //SOLUZIONE TEMPORANEA ⬆️
                             .    '<td class="tipo">' . htmlspecialchars($type) . '</td>'
@@ -134,7 +155,7 @@ function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, f
                             .    '<td class="attuale">',
                 'rowClose' =>    '</td>'
                             .    '<td class="target">' . ($targetRaw === '' ? '-' : htmlspecialchars($targetRaw)) . '</td>'
-                            .    '<td class="delta-qty">-</td>'
+                            .    '<td class="delta-qty">' . htmlspecialchars($deltaText) . '</td>'
                         .  '</tr>'
             ];
 
@@ -153,7 +174,7 @@ function renderChildren(DOMElement $parent, DOMXPath $xp, callable &$getPrice, f
 
 $xml = new DOMDocument();
 $xml->preserveWhiteSpace = false;
-$xml->load('data/portafoglio.xml');
+$xml->load($path) or die('Errore nel caricamento del file di dati del portafoglio.');
 
 $xp = new DOMXPath($xml);
 
@@ -181,8 +202,8 @@ $liqTarget = $liqTargetNode ? toFloat($liqTargetNode->textContent) : 0.0;
        data-symbol="<?php echo htmlspecialchars($symbol); ?>"
 >
   <thead>
-    <tr>
-        <th>🛠️</th>
+    <tr data-path=''>
+        <th><button type="button" id="table-button" class="edit-button" data-open-assets>🛠️</button></th>
         <th>Tipo</th>
         <th>Nome</th>
         <th>Qty</th>
@@ -199,27 +220,37 @@ $liqTarget = $liqTargetNode ? toFloat($liqTargetNode->textContent) : 0.0;
 // === gestione ricorsiva assets ===
 $root = $xp->query('/portafoglio/assets')->item(0);
 $BASE_URL = 'brunomichele.gloria.XML-DOM/';
-$priceCache = [];
 
 $getPrice = function(string $ticker, string $tipo) use (&$priceCache) : float {
   if (!$ticker) return 0.0;
-  if (isset($priceCache[$ticker])) return $priceCache[$ticker];
+  if (isset($priceCache[$ticker]) && isset($_SESSION['lastPriceFetch'][$ticker]) && $_SESSION['lastPriceFetch'][$ticker] === date('Ymd')) return $priceCache[$ticker];
 
   $p = 0.00;
   if ($tipo === 'obbligazione') {
-   // $p = getPriceBondInvesting($ticker);
+    $p = getPriceBondInvesting($ticker);
     if ($p < 0.00) {
-       // $p = getPriceBondBI($ticker);
+      $p = getPriceBondBI($ticker);
     }
   } else {
-   // $p = getPriceYahoo($ticker);
+    $p = getPriceYahoo($ticker);
   }
   
-  if ($p > 0.00) return $priceCache[$ticker] = (float)$p;
-  return $p;
+  $_SESSION['lastPriceFetch'][$ticker] = date('Ymd');
+  return $priceCache[$ticker] = (float)$p;
 };
 
-[$tbodyHtml, $totalAssets] = renderChildren($root, $xp, $getPrice, $liquidita, '');
+[$tbodyHtml, $totalAssets] = renderChildren($root, $xp, $getPrice, $liquidita, '', $valuta);
+$_SESSION['priceCache'] = $priceCache;
+if (isset($_GET['rebalance'])) {
+	try {
+		$rebalanceReport = rebalance($path, $priceCache);
+		$_SESSION['rebalanceReport'] = $rebalanceReport;
+		[$tbodyHtml, $totalAssets] = renderChildren($root, $xp, $getPrice, $liquidita, '', $valuta);
+	} catch (Exception $e) {
+		$rebalanceError = 'Errore durante il ribilanciamento: ' . $e->getMessage();
+		echo '<tr><td colspan="9" class="error-message">' . htmlspecialchars($rebalanceError) . '</td></tr>';
+	}
+}
 echo $tbodyHtml;
 
 ?>
@@ -227,7 +258,7 @@ echo $tbodyHtml;
   <tfoot>
     <tr>
       <td colspan="9">
-        Liquidità:
+        Liquidit&agrave;:
         <span id="liquidita-totale" 
               data-liqTarget="<?php echo htmlspecialchars($liqTarget); ?>"
               data-liqattuale="<?php echo htmlspecialchars(number_format($totalAssets? $liquidita / $totalAssets * 100 : 0, 2, ",", ".")); ?>">
@@ -240,8 +271,8 @@ echo $tbodyHtml;
              ·
             <?php
                 $parts = [];
-                if ($tolleranza !== '')   $parts[] = "&nbsp" . 'Tolleranza: ' . htmlspecialchars($tolleranza) . '%';
-                if ($commissione !== '0') $parts[] = "&nbsp" . 'Commissione: ' . htmlspecialchars($commissione) . htmlspecialchars($symbol);
+                if ($tolleranza !== '')   $parts[] = "&nbsp;" . 'Tolleranza: ' . htmlspecialchars($tolleranza) . '%';
+                if ($commissione !== '0') $parts[] = "&nbsp;" . 'Commissione: ' . htmlspecialchars($commissione) . htmlspecialchars($symbol);
                 echo implode(' · ', $parts);
             ?>
         </span>
