@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE portafoglio SYSTEM "portafoglio.dtd">
+<portafoglio valuta="€">
+	<informazioni tolleranza="5" ultimoAggiornamento="2025-09-08" commissione="5"/>
+	<assets>
+		<bucket valuta="€">
+			<nome>Tech-Giants</nome>
+			<target>75</target>
+			<azione ticker="AAPL" valuta="$">
+				<nome>Apple</nome>
+				<target>40</target>
+				<operazioni>
+					<operazione>
+						<data>2024-05-01</data>
+						<quantita>9</quantita>
+						<prezzo>160</prezzo>
+					</operazione>
+					<operazione>
+						<data>2024-06-01</data>
+						<quantita>2</quantita>
+						<prezzo>170</prezzo>
+					</operazione>
+					<operazione>
+						<data>20251124-16:47:21</data>
+						<quantita>5</quantita>
+						<prezzo>271.960000</prezzo>
+					</operazione>
+					<operazione>
+						<data>20251125-10:48:39</data>
+						<quantita>-1</quantita>
+						<prezzo>275.920000</prezzo>
+					</operazione>
+				</operazioni>
+			</azione>
+			<azione ticker="GOOGL" valuta="$">
+				<nome>Google</nome>
+				<target>60</target>
+				<operazioni>
+					<operazione>
+						<data>2024-06-15</data>
+						<quantita>17</quantita>
+						<prezzo>120</prezzo>
+					</operazione>
+					<operazione>
+						<data>20251124-16:47:42</data>
+						<quantita>3</quantita>
+						<prezzo>299.660000</prezzo>
+					</operazione>
+					<operazione>
+						<data>20251125-10:03:24</data>
+						<quantita>-4</quantita>
+						<prezzo>318.580000</prezzo>
+					</operazione>
+				</operazioni>
+			</azione>
+		</bucket>
+		<obbligazione ticker="IT0005532723" valuta="€" taxRate="12.5" tradeStep="1000">
+			<nome>Btp Italia Mz28 Eur</nome>
+			<target>25</target>
+			<cedola>2.00</cedola>
+			<frequenza_cedola>Semestrale</frequenza_cedola>
+			<scadenza>2028-03-14</scadenza>
+			<operazioni>
+				<operazione>
+					<data>2025-09-10</data>
+					<quantita>3000</quantita>
+					<prezzo>101.16062</prezzo>
+				</operazione>
+				<operazione>
+					<data>20251120-16:47:31</data>
+					<quantita>3000</quantita>
+					<prezzo>102.010000</prezzo>
+				</operazione>
+				<operazione>
+					<data>20251124-16:47:01</data>
+					<quantita>-2000</quantita>
+					<prezzo>0.000000</prezzo>
+				</operazione>
+			</operazioni>
+		</obbligazione>
+	</assets>
+	<liquidita valuta="€">
+		<totale>317.00</totale>
+		<target>0</target>
+	</liquidita>
+</portafoglio>

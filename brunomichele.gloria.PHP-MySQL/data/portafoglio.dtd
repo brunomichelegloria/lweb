@@ -1,0 +1,90 @@
+<!-- ================= ENTITÀ DI SUPPORTO ================= -->
+<!ENTITY EUR "€">
+<!ENTITY USD "$">
+<!ENTITY GBP "£">
+
+<!-- ================= NOTAZIONI (esempio allegati) ================= -->
+<!NOTATION pdf SYSTEM "application/pdf">
+<!ATTLIST documento
+    tipo NOTATION (pdf) #IMPLIED
+>
+
+<!-- ================= STRUTTURA PRINCIPALE ================= -->
+
+<!ELEMENT portafoglio (informazioni, assets, liquidita)>
+<!ATTLIST portafoglio
+    valuta CDATA "EUR"
+>
+
+    <!-- ===== INFORMAZIONI DEL PORTAFOGLIO ===== -->
+    <!ELEMENT informazioni EMPTY>
+    <!ATTLIST informazioni
+        tolleranza CDATA #REQUIRED
+        ultimoAggiornamento CDATA #REQUIRED
+        commissione CDATA "0"
+        defaultTradeStepAz CDATA "1"
+        defaultTradeStepEtf CDATA "1"
+        defaultTradeStepBond CDATA "1"
+    >
+
+    <!-- ===== ASSET NEGOZIABILI ===== -->
+    <!ELEMENT assets (obbligazione | azione | etf | bucket)*>
+
+        <!-- OBBLIGAZIONE -->
+        <!ELEMENT obbligazione (nome?, target?, cedola?, frequenza_cedola?, scadenza?, operazioni)>
+        <!ATTLIST obbligazione
+            ticker CDATA #REQUIRED
+            valuta CDATA "EUR"
+            taxRate CDATA "0.26"
+            tradeStep CDATA #IMPLIED
+        >
+
+        <!-- AZIONE -->
+        <!ELEMENT azione (nome?, target?, operazioni)>
+        <!ATTLIST azione
+            ticker CDATA #REQUIRED
+            valuta CDATA "EUR"
+            taxRate CDATA "0.26"
+            tradeStep CDATA #IMPLIED
+        >
+
+        <!-- ETF -->
+        <!ELEMENT etf (nome?, target?, operazioni)>
+        <!ATTLIST etf
+            ticker CDATA #REQUIRED
+            valuta CDATA "EUR"
+            taxRate CDATA "0.26"
+            tradeStep CDATA #IMPLIED
+        >
+
+        <!-- BUCKET (per raggruppare più asset simili) -->
+        <!ELEMENT bucket (nome, target?, (azione|etf|obbligazione|bucket)*)>
+        <!ATTLIST bucket
+            valuta CDATA "EUR"
+            tradeStep CDATA #IMPLIED
+        >
+
+            <!-- Elementi comuni -->
+            <!ELEMENT nome (#PCDATA)>
+            <!ELEMENT target (#PCDATA)>
+            <!ELEMENT operazioni (operazione*)>
+
+                <!ELEMENT operazione (data, quantita, prezzo)>
+                <!ATTLIST operazione
+                    valuta CDATA "EUR"
+                >
+                    <!ELEMENT data (#PCDATA)>
+                    <!ELEMENT quantita (#PCDATA)>
+                    <!ELEMENT prezzo (#PCDATA)>
+
+            <!-- Solo obbligazioni -->
+            <!ELEMENT cedola (#PCDATA)>
+            <!ELEMENT frequenza_cedola (#PCDATA)>
+            <!ELEMENT scadenza (#PCDATA)>
+
+    <!-- ===== LIQUIDITA' ===== -->
+    <!ELEMENT liquidita (totale, target?)>
+    <!ATTLIST liquidita
+        valuta CDATA "EUR"
+    >
+        <!ELEMENT totale (#PCDATA)>
