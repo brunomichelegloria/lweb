@@ -447,3 +447,32 @@ a[href*="logout.php"] {
     color: #111;
     border-radius: 8px;
 }
+
+.bucket-zone-even {
+    background-color: rgb(16, 16, 16);
+}
+
+.bucket-zone-odd {
+    background-color: rgb(79, 78, 78);
+}
+
+.bucket-zone {
+    width: 100%;
+    padding: 1vw;
+}
+
+.bucket-nested {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0.35vw;
+    margin: 0;
+}
+
+.bucket-nested th,
+.bucket-nested td {
+    border: 0.1vw solid #ccc;
+    padding: 1vw 0.5vw;
+    max-width: 20vw;
+    text-align: center;
+    background: rgb(31, 31, 31);
+}

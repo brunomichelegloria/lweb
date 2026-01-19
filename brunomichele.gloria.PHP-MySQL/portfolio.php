@@ -26,6 +26,60 @@ if (!$pf) {
     exit;
 }
 
+$rootBucketId = (int)$pf['ID_Radice'];
+
+$bucketById = [];
+$childrenMap = [];
+
+$stmtRoot = $pdo->prepare("SELECT ID_Bucket, ID_Padre, Nome, TargetPctSuPadre FROM Bucket WHERE ID_Bucket = ?");
+$stmtRoot->execute([$rootBucketId]);
+$rootRow = $stmtRoot->fetch();
+
+if ($rootRow) {
+    $queue = [$rootBucketId];
+
+    $bucketById[$rootBucketId] = [
+        'ID_Bucket' => (int)$rootRow['ID_Bucket'],
+        'ID_Padre' => $rootRow['ID_Padre'] !== null ? (int)$rootRow['ID_Padre'] : null,
+        'Nome' => (string)$rootRow['Nome'],
+        'TargetPctSuPadre' => $rootRow['TargetPctSuPadre'] !== null ? (float)$rootRow['TargetPctSuPadre'] : null,
+    ];
+
+    while (!empty($queue)) {
+        $batch = array_splice($queue, 0, 50);
+
+        $placeholders = implode(',', array_fill(0, count($batch), '?'));
+        $sql = "SELECT ID_Bucket, ID_Padre, Nome, TargetPctSuPadre
+                FROM Bucket
+                WHERE ID_Padre IN ($placeholders)";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($batch);
+        $rows = $stmt->fetchAll();
+
+        foreach ($rows as $r) {
+            $idB = (int)$r['ID_Bucket'];
+            $idP = $r['ID_Padre'] !== null ? (int)$r['ID_Padre'] : null;
+
+            if (isset($bucketById[$idB])) {
+                continue;
+            }
+
+            $bucketById[$idB] = [
+                'ID_Bucket' => $idB,
+                'ID_Padre' => $idP,
+                'Nome' => (string)$r['Nome'],
+                'TargetPctSuPadre' => $r['TargetPctSuPadre'] !== null ? (float)$r['TargetPctSuPadre'] : null,
+            ];
+
+            if (!isset($childrenMap[$idP])) $childrenMap[$idP] = [];
+            $childrenMap[$idP][] = $idB;
+
+            $queue[] = $idB;
+        }
+    }
+}
+
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
 ?>
@@ -72,31 +126,95 @@ unset($_SESSION['flash']);
 
             <div id="tabella-e-grafico">
 
-                <!-- TABELLA -->
                 <div class="pf-tablewrap">
 
                     <table class="bucket-table" id="tab-portafoglio">
                         <thead>
-                        <tr>
-                            <th class="col-icon"></th>
-                            <th>Tipo</th>
-                            <th>Nome</th>
-                            <th>Qty</th>
-                            <th>Prezzo</th>
-                            <th>Valore</th>
-                            <th>Attuale %</th>
-                            <th>Target %</th>
-                            <th>Δ Qty</th>
-                        </tr>
+                            <tr>
+                                <th class="col-icon"><button type="button" class="edit-button" data-open-assets data-bucket-id="<?= (int)$rootBucketId ?>">🛠️</button></th>
+                                <th>Tipo</th>
+                                <th>Nome</th>
+                                <th>Qty</th>
+                                <th>Prezzo</th>
+                                <th>Valore</th>
+                                <th>Attuale %</th>
+                                <th>Target %</th>
+                                <th>Δ Qty</th>
+                            </tr>
                         </thead>
 
                         <tbody id="bucket-tbody">
-                        <tr>
-                            <td class="pf-empty" colspan="9">
-                            Tabella vuota (in attesa dei dati dal database).
-                            </td>
-                        </tr>
+                        <?php
+                            $tbodyHtml = '';
+                            $totalSum = 0.0;
+
+                            $pdo = getPDO();
+
+                            $stmtRootAssets = $pdo->prepare("
+                                SELECT
+                                    ca.ID_Bucket,
+                                    ca.ISIN,
+                                    ca.TargetPctNelBucket,
+                                    ca.TaxRatePct,
+                                    a.Nome AS AssetNome,
+                                    a.Valuta,
+                                    a.Tipo,
+                                    e.Ticker
+                                FROM ContenutoAsset ca
+                                INNER JOIN Asset a ON a.ISIN = ca.ISIN
+                                LEFT JOIN ETF e ON e.ISIN = a.ISIN
+                                WHERE ca.ID_Bucket = ?
+                                ORDER BY a.Tipo, a.Nome, ca.ISIN
+                            ");
+                            $stmtRootAssets->execute([$rootBucketId]);
+                            $rootAssets = $stmtRootAssets->fetchAll();
+
+                            foreach ($rootAssets as $r) {
+                                $tipo = strtolower((string)$r['Tipo']);
+                                $nome = (string)($r['AssetNome'] ?? ($r['Ticker'] ?? $r['ISIN']));
+                                $isin = (string)$r['ISIN'];
+                                $valuta = (string)($r['Valuta'] ?? 'EUR');
+                                $ticker = (string)($r['Ticker'] ?? '');
+
+                                [$avgCost, $qty] = getWAC_DB($pdo, $rootBucketId, $isin);
+
+                                $targetRaw = $r['TargetPctNelBucket'];
+                                $targetPrint = ($targetRaw === null) ? '-' : number_format((float)$targetRaw, 2, ',', '.');
+
+                                $tbodyHtml .=
+                                    '<tr class="asset-row" data-type="' . h($tipo) . '"'
+                                    . ' data-nome="' . h($nome) . '"'
+                                    . ' data-isin="' . h($isin) . '"'
+                                    . ' data-ticker="' . h($ticker) . '"'
+                                    . ' data-quantita="' . h((string)$qty) . '"'
+                                    . ' data-valuta="' . h($valuta) . '"'
+                                    . ' data-target-raw="' . h($targetPrint) . '">'
+                                    . '<td class="edit-cell"><button type="button" class="edit-button" data-role="ops-gear">⚙️</button></td>'
+                                    . '<td class="tipo">' . h($tipo) . '</td>'
+                                    . '<td class="nome">' . h($nome) . '</td>'
+                                    . '<td class="quantita">' . h((string)$qty) . '</td>'
+                                    . '<td class="prezzo">-</td>'
+                                    . '<td class="valore">-</td>'
+                                    . '<td class="attuale">-</td>'
+                                    . '<td class="target">' . h($targetPrint) . '</td>'
+                                    . '<td class="delta-qty">-</td>'
+                                    . '</tr>';
+                            }
+
+                            foreach ($childrenMap[$rootBucketId] ?? [] as $childId) {
+                                [$h, $s] = renderBucketsDB((int)$childId, $bucketById, $childrenMap, '');
+                                $tbodyHtml .= $h;
+                                $totalSum += $s;
+                            }
+
+                            if ($tbodyHtml === '') {
+                                echo '<tr><td class="pf-empty" colspan="9">Portafoglio vuoto.</td></tr>';
+                            } else {
+                                echo $tbodyHtml;
+                            }
+                        ?>
                         </tbody>
+
                     </table>
 
                     <tfoot>
@@ -172,50 +290,265 @@ unset($_SESSION['flash']);
             </div>
         </div>
 
-        <dialog id="asset-dialog">
-            <form id="asset-form" method="dialog">
-                <div class="dialog-body">
-                    <h3 class="pf-dialog-title">Gestione portafoglio</h3>
+        <dialog id="asset-dialog" class="toggable-menu" data-counter="0">
+            <form id="asset-form" method="POST" action="lib/modificaBucket.php">
+                <input type="hidden" name="portfolioId" id="asset-dialog-portfolioId" value="<?= (int)$pf['ID_Portafoglio'] ?>">
+                <input type="hidden" name="scopeBucketId" id="asset-dialog-scopeBucketId" value="">
+                <input type="hidden" name="mode" id="asset-dialog-mode" value="bucket">
 
-                    <div class="asset-field">
-                        <label>Liquidità</label>
-                        <input type="number" step="0.01" value="<?= h((string)$pf['Liquidita']) ?>">
-                    </div>
-
-                    <div class="asset-field">
-                        <label>Target liquidità (%)</label>
-                        <input type="number" step="0.001" value="<?= h((string)$pf['TargetLiquiditaPct']) ?>">
-                    </div>
-
-                    <div class="asset-field">
-                        <label>Tolleranza (%)</label>
-                        <input type="number" step="0.001" value="<?= h((string)$pf['Tolleranza']) ?>">
-                    </div>
-
-                    <div class="asset-field">
-                        <label>Commissione</label>
-                        <input type="number" step="0.0001" value="<?= h((string)($pf['Commissione'] ?? 0)) ?>">
-                    </div>
-
-                    <hr>
-
-                    <p class="pf-dialog-hint">Qui inseriremo l’editor di bucket e asset (come nella versione originale).</p>
-                </div>
+                <div class="dialog-body"></div>
 
                 <div class="dialog-footer">
-                    <div>
-                        <button class="btn-mini" type="button" id="add-bucket">+ Bucket</button>
-                        <button class="btn-mini" type="button" id="add-azione">+ Azione</button>
-                        <button class="btn-mini" type="button" id="add-etf">+ ETF</button>
-                        <button class="btn-mini" type="button" id="add-obbl">+ Obbligazione</button>
+                    <div class="footer-left">
+                        <button type="button" id="assetAddBucket" class="btn-mini">+ Bucket</button>
+                        <button type="button" id="assetAddAzione" class="btn-mini">+ Azione</button>
+                        <button type="button" id="assetAddEtf" class="btn-mini">+ ETF</button>
+                        <button type="button" id="assetAddObb" class="btn-mini">+ Obbligazione</button>
                     </div>
-                    <div>
-                        <button class="btn-mini" value="cancel">Annulla</button>
-                        <button class="btn-mini" value="default">Invia</button>
+                    <div class="footer-right">
+                        <button type="button" id="btn-cancel" class="btn-mini">Annulla</button>
+                        <button type="submit" class="btn-mini">Invia</button>
                     </div>
                 </div>
             </form>
         </dialog>
 
+        <template id="template-portfolio-info">
+            <fieldset class="asset-field" data-kind="portfolio">
+                <legend>Informazioni Portafoglio</legend>
+
+                <div class="template-div">
+                    <label>Liquidità:
+                        <input type="number" step="0.01" name="assets[info][Liquidita]" disabled>
+                    </label>
+
+                    <label>Target liquidità (%):
+                        <input type="number" step="0.001" min="0" max="100" name="assets[info][TargetLiquiditaPct]" disabled>
+                    </label>
+
+                    <label>Tolleranza (%):
+                        <input type="number" step="0.001" min="0" max="100" name="assets[info][Tolleranza]" disabled>
+                    </label>
+
+                    <label>Commissione:
+                        <input type="number" step="0.0001" min="0" name="assets[info][Commissione]" disabled>
+                    </label>
+
+                    <label>Tipo commissione:
+                        <select name="assets[info][TipoCommissione]" disabled>
+                            <option value="Fissa">Fissa</option>
+                            <option value="Percentuale">Percentuale</option>
+                        </select>
+                    </label>
+
+                    <label>Valuta:
+                        <input type="text" name="assets[info][Valuta]" disabled>
+                    </label>
+                </div>
+
+                <div class="asset-actions">
+                    <button type="button" class="asset-edit btn-mini" title="Modifica">✎</button>
+                </div>
+            </fieldset>
+        </template>
+
+        <template id="template-bucket">
+            <fieldset class="asset-field" data-kind="bucket">
+                <div class="template-div">
+                    <p>Bucket</p>
+
+                    <div class="template-bucket-main">
+                        <label>Nome:
+                            <input name="assets[__ID__][Nome]" disabled required>
+                        </label>
+
+                        <label>Target:
+                            <input type="number" step="0.01" min="0" max="100" name="assets[__ID__][TargetPctSuPadre]" disabled>
+                        </label>
+
+                        <input type="hidden" name="assets[__ID__][tipo]" value="bucket" disabled>
+                        <input type="hidden" name="assets[__ID__][new]" value="0" disabled>
+                        <input type="hidden" name="assets[__ID__][remove]" value="0" disabled>
+                        <input type="hidden" name="assets[__ID__][ID_Bucket]" value="" disabled>
+                    </div>
+                </div>
+
+                <div class="asset-actions">
+                    <button type="button" class="asset-edit btn-mini" title="Modifica">✎</button>
+                    <button type="button" class="asset-remove btn-mini btn-danger">⌫</button>
+                </div>
+            </fieldset>
+        </template>
+        
+        <template id="template-azione">
+            <fieldset class="asset-field" data-kind="azione">
+                <div class="template-div">
+                    <p>Azione</p>
+
+                    <div class="template-azione-main">
+                        <label>ISIN:
+                            <input name="assets[__ID__][ISIN]" required disabled>
+                        </label>
+
+                        <label>Nome:
+                            <input name="assets[__ID__][Nome]" disabled>
+                        </label>
+
+                        <label>Target:
+                            <input type="number" step="0.01" min="0" max="100" name="assets[__ID__][TargetPctNelBucket]" disabled>
+                        </label>
+
+                        <input type="hidden" name="assets[__ID__][tipo]" value="Azione" disabled>
+                        <input type="hidden" name="assets[__ID__][new]" value="0" disabled>
+                        <input type="hidden" name="assets[__ID__][remove]" value="0" disabled>
+                        <input type="hidden" name="assets[__ID__][ID_Bucket]" value="" disabled>
+                    </div>
+
+                    <details class="template-azione-details">
+                        <summary>Dettagli</summary>
+
+                        <label>Tax rate (%):
+                            <input type="number" step="0.01" min="0" max="100" name="assets[__ID__][TaxRate]" disabled>
+                        </label>
+
+                        <label>Valuta:
+                            <input type="text" name="assets[__ID__][Valuta]" disabled>
+                        </label>
+                    </details>
+                </div>
+
+                <div class="asset-actions">
+                    <button type="button" class="asset-edit btn-mini" title="Modifica">✎</button>
+                    <button type="button" class="asset-remove btn-mini btn-danger">⌫</button>
+                </div>
+            </fieldset>
+        </template>
+
+        <template id="template-etf">
+            <fieldset class="asset-field" data-kind="etf">
+                <div class="template-div">
+                    <p>ETF</p>
+
+                    <div class="template-etf-main">
+                        <label>Ticker:
+                            <input name="assets[__ID__][Ticker]" required disabled placeholder="ACWI.MI">
+                        </label>
+
+                        <label>Nome:
+                            <input name="assets[__ID__][Nome]" disabled>
+                        </label>
+
+                        <label>Target:
+                            <input type="number" step="0.01" min="0" max="100" name="assets[__ID__][TargetPctNelBucket]" disabled>
+                        </label>
+
+                        <input type="hidden" name="assets[__ID__][tipo]" value="ETF" disabled>
+                        <input type="hidden" name="assets[__ID__][new]" value="0" disabled>
+                        <input type="hidden" name="assets[__ID__][remove]" value="0" disabled>
+                        <input type="hidden" name="assets[__ID__][ID_Bucket]" value="" disabled>
+                        <input type="hidden" name="assets[__ID__][ISIN]" value="" disabled>
+                    </div>
+
+                    <details class="template-etf-details">
+                        <summary>Dettagli</summary>
+
+                        <label>ISIN:
+                            <input name="assets[__ID__][ISIN_DETAILS]" disabled>
+                        </label>
+
+                        <label>Tax rate (%):
+                            <input type="number" step="0.01" min="0" max="100" name="assets[__ID__][TaxRate]" disabled>
+                        </label>
+
+                        <label>Valuta:
+                            <input type="text" name="assets[__ID__][Valuta]" disabled>
+                        </label>
+
+                        <label>TER:
+                            <input type="number" step="0.0001" name="assets[__ID__][TER]" disabled>
+                        </label>
+
+                        <label>Distribuzione:
+                            <select name="assets[__ID__][Distribuzione]" disabled>
+                                <option value="Accumulating">Accumulating</option>
+                                <option value="Distributing">Distributing</option>
+                            </select>
+                        </label>
+
+                        <label>Indice:
+                            <input type="text" name="assets[__ID__][Indice]" disabled>
+                        </label>
+                    </details>
+                </div>
+
+                <div class="asset-actions">
+                    <button type="button" class="asset-edit btn-mini" title="Modifica">✎</button>
+                    <button type="button" class="asset-remove btn-mini btn-danger">⌫</button>
+                </div>
+            </fieldset>
+        </template>
+
+        <template id="template-obbligazione">
+            <fieldset class="asset-field" data-kind="obbligazione">
+                <div class="template-div">
+                    <p>Obbligazione</p>
+
+                    <div class="template-obbligazione-main">
+                        <label>ISIN:
+                            <input name="assets[__ID__][ISIN]" required disabled>
+                        </label>
+
+                        <label>Nome:
+                            <input name="assets[__ID__][Nome]" disabled>
+                        </label>
+
+                        <label>Target:
+                            <input type="number" step="0.01" min="0" max="100" name="assets[__ID__][TargetPctNelBucket]" disabled>
+                        </label>
+
+                        <input type="hidden" name="assets[__ID__][tipo]" value="Obbligazione" disabled>
+                        <input type="hidden" name="assets[__ID__][new]" value="0" disabled>
+                        <input type="hidden" name="assets[__ID__][remove]" value="0" disabled>
+                        <input type="hidden" name="assets[__ID__][ID_Bucket]" value="" disabled>
+                    </div>
+
+                    <details class="template-obbligazione-details">
+                        <summary>Dettagli</summary>
+
+                        <label>Tax rate (%):
+                            <input type="number" step="0.01" min="0" max="100" name="assets[__ID__][TaxRate]" disabled>
+                        </label>
+
+                        <label>Valuta:
+                            <input type="text" name="assets[__ID__][Valuta]" disabled>
+                        </label>
+
+                        <label>Cedola (%):
+                            <input type="number" step="0.0001" name="assets[__ID__][CedolaPct]" disabled>
+                        </label>
+
+                        <label>Frequenza cedola:
+                            <select name="assets[__ID__][FrequenzaCedola]" disabled>
+                                <option value=""></option>
+                                <option value="Annuale">Annuale</option>
+                                <option value="Semestrale">Semestrale</option>
+                                <option value="Triennale">Triennale</option>
+                                <option value="Mensile">Mensile</option>
+                            </select>
+                        </label>
+
+                        <label>Scadenza:
+                            <input type="date" name="assets[__ID__][Scadenza]" disabled>
+                        </label>
+                    </details>
+                </div>
+
+                <div class="asset-actions">
+                    <button type="button" class="asset-edit btn-mini" title="Modifica">✎</button>
+                    <button type="button" class="asset-remove btn-mini btn-danger">⌫</button>
+                </div>
+            </fieldset>
+        </template>
+    
     </body>
 </html>

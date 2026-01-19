@@ -46,45 +46,150 @@ function requireLogin(PDO $pdo): array {
     return $row;
 }
 
-function savePretty(string $path): bool
-{
-    $txt = @file_get_contents($path);
-    if ($txt === false) return false;
+function renderBucketChildrenDB(PDO $pdo, int $bucketId, array $bucketById, array $childrenMap, string $parentPath): array {
+    $childrenItems = [];
+    $sum = 0.0;
 
+    $stmtA = $pdo->prepare("
+        SELECT
+            ca.ID_Bucket,
+            ca.ISIN,
+            ca.TargetPctNelBucket,
+            ca.TaxRatePct,
+            a.Nome AS AssetNome,
+            a.Valuta,
+            a.Tipo,
+            e.Ticker
+        FROM ContenutoAsset ca
+        INNER JOIN Asset a ON a.ISIN = ca.ISIN
+        LEFT JOIN ETF e ON e.ISIN = a.ISIN
+        WHERE ca.ID_Bucket = ?
+        ORDER BY a.Tipo, a.Nome, ca.ISIN
+    ");
+    $stmtA->execute([$bucketId]);
+    $assetRows = $stmtA->fetchAll();
 
-    $pretty = preg_replace("/\n/", "", $txt); // mette tutto in un unica riga
-    $pretty = preg_replace("/>\s*</", "><", $pretty); // toglie tab o spazi rimasti
+    foreach ($assetRows as $r) {
+        $tipo = strtolower((string)$r['Tipo']);
+        $assetNome = (string)($r['AssetNome']?? ($r['Ticker'] ?? $r['ISIN']));
+        $isin = (string)$r['ISIN'];
+        $valuta = (string)($r['Valuta'] ?? 'EUR');
+        $ticker = (string)($r['Ticker'] ?? '');
 
-    $pretty = preg_replace('/></', ">\n<", $pretty); // manda a capo quando due tag sono vicini
-    $pretty = preg_replace('/<([A-Za-z]*)([^\/>]*)>\n<\/$1>/', "<$1$2></$1>", $pretty); // rimuove il \n nel caso di elemento vuoto (inutile visto che il DOM save cancella tutto)
+        $targetAssetRaw = $r['TargetPctNelBucket'];
+        $includedAsset = ($targetAssetRaw !== null);
+        $targetPrint = ($targetAssetRaw === null) ? '-' : number_format((float)$targetAssetRaw, 2, ',', '.');
 
-    $lines = preg_split("/\r\n|\r|\n/", $pretty);
+        [$avgCost, $qty] = getWAC_DB($pdo, $bucketId, $isin);
 
-    $tabs = 0;
-    $out = [];
-    foreach($lines as $line) {
-        $trim = trim($line);
+        $unitPrice = 0.0;
+        $value = 0.0;
+        if ($includedAsset) $sum += $value;
 
-        if (preg_match('/<?xml/', $trim) || preg_match('/<!DOCTYPE/', $trim)) {
-            $out[] = $trim;
-            continue;
-        }
-        if (preg_match('/<[^\/]*>/', $trim) && !preg_match('/<[^\/]*>[^><]*<\//', $trim)) { // <asd> che contiene altri elementi
-            $out[] = str_repeat("\t", $tabs) . $trim;
-            $tabs++;
-        } elseif (preg_match('/<\/[A-Za-z]*>/', $trim) && !preg_match('/<[^\/]*>/', $trim)) { // </asd>
-            --$tabs;
-            $out[] = str_repeat("\t", $tabs) . $trim;
-        } elseif (preg_match('/<[^\/]*>[^><]*<\//', $trim) || preg_match('/<[^\/>]*\/>/', $trim)) {  // <asd>text</asd> || <asd attributo="asd" />
-            $out[] = str_repeat("\t", $tabs) . $trim;
-        }
+        $childAssetKey = ($tipo === 'etf' && $ticker !== '') ? $ticker : $isin;
+        $assetPath = $parentPath . '/' . sanitize_id($childAssetKey);
+
+        $prezzoPrint = ($unitPrice > 0) ? number_format($unitPrice, 2, ',', '.') : '-';
+        $valorePrint = ($value > 0) ? number_format($value, 2, ',', '.') : '-';
+
+        $childrenItems[] = [
+            'type' => $tipo,
+            'value' => $value,
+            'included' => $includedAsset,
+            'rowOpen' =>
+                '<tr class="asset-row" data-type="' . h($tipo) . '"'
+                . ' data-path="' . h($assetPath) . '"'
+                . ' data-nome="' . h($assetNome) . '"'
+                . ' data-isin="' . h($isin) . '"'
+                . ' data-ticker="' . h($ticker) . '"'
+                . ' data-quantita="' . h((string)$qty) . '"'
+                . ' data-valuta="' . h($valuta) . '"'
+                . ' data-costo="' . h(number_format((float)$avgCost, 6, '.', '')) . '"'
+                . ' data-tax-rate="' . h(number_format((float)$r['TaxRatePct'] * 100, 2, '.', '')) . '"'
+                . ' data-prezzo="' . h(number_format((float)$unitPrice, 6, '.', '')) . '"'
+                . ' data-target-raw="' . h($targetPrint) . '">'
+                . '<td class="edit-cell"><button type="button" class="edit-button" data-role="ops-gear">⚙️</button></td>'
+                . '<td class="tipo">' . h($tipo) . '</td>'
+                . '<td class="nome">' . h($assetNome) . '</td>'
+                . '<td class="quantita">' . h((string)$qty) . '</td>'
+                . '<td class="prezzo">' . h($prezzoPrint) . '</td>'
+                . '<td class="valore">' . h($valorePrint) . '</td>'
+                . '<td class="attuale">',
+            'rowClose' =>
+                '</td>'
+                . '<td class="target">' . h($targetPrint) . '</td>'
+                . '<td class="delta-qty">-</td>'
+                . '</tr>'
+        ];
     }
 
-    $pretty = implode("\n", $out) . "\n";
+    foreach ($childrenMap[$bucketId] ?? [] as $childId) {
+        [$hChild, $sChild] = renderBucketsDB($childId, $bucketById, $childrenMap, $parentPath);
+        $childrenItems[] = [
+            'type' => 'bucket',
+            'value' => $sChild,
+            'included' => true,
+            'rowOpen' => $hChild,
+            'rowClose' => ''
+        ];
+        $sum += $sChild;
+    }
 
-    $tmp = $path . '.tmp';
-    if (@file_put_contents($tmp, $pretty, LOCK_EX) === false) return false;
-    return @rename($tmp, $path);
+    $html = '';
+    $denom = $sum;
+
+    foreach ($childrenItems as $it) {
+        $html .= $it['rowOpen'] . $it['rowClose'];
+    }
+
+    return [$html, $denom];
+}
+
+function renderBucketsDB(int $bucketId, array $bucketById, array $childrenMap, string $parentPath): array {
+    $pdo = getPDO();
+
+    $b = $bucketById[$bucketId];
+
+    $name = $b['Nome'];
+    $targetRaw = $b['TargetPctSuPadre'];
+    $included = ($targetRaw !== null);
+
+    $childPath = $parentPath . '/' . sanitize_id($name);
+    $colore = (substr_count($childPath, '/') % 2 === 0) ? 'bucket-details-even' : 'bucket-details-odd';
+
+    [$innerHtml, $innerSum] = renderBucketChildrenDB($pdo, $bucketId, $bucketById, $childrenMap, $childPath);
+    if (!$included) {
+        $innerSum = 0.0;
+    }
+
+    $targetPrint = ($targetRaw === null) ? '-' : number_format((float)$targetRaw, 2, ',', '.');
+
+    $rowOpen =
+        '<tr class="bucket-row" data-type="bucket" data-nome="' . h($name) . '" data-path="' . h($childPath) . '" data-target-raw="' . h($targetPrint) . '">'
+        . '<td class="edit-cell"><button type="button" class="edit-button" data-open-assets data-bucket-id="' . (int)$bucketId . '">🛠️</button></td>'
+        . '<td class="tipo">bucket</td>'
+        . '<td class="nome">' . h($name) . '</td>'
+        . '<td class="quantita">-</td>'
+        . '<td class="prezzo">-</td>'
+        . '<td class="valore">' . ($innerSum > 0 ? h(number_format($innerSum, 2, ',', '.')) : '-') . '</td>'
+        . '<td class="attuale">';
+
+    $rowClose =
+        '</td>'
+        . '<td class="target">' . h($targetPrint) . '</td>'
+        . '<td class="delta-qty">-</td>'
+        . '<td class="toggle-details-cell"><button type="button" class="toggle-details-button" data-toggle="' . (int)$bucketId . '">&#9664;</button></td>'
+        . '</tr>'
+        . '<tr class="bucket-details ' . h($colore) . '" data-details-of="' . (int)$bucketId . '">'
+        . '<td colspan="9"><table class="bucket-table"><tbody>'
+        . $innerHtml
+        . '</tbody></table></td>'
+        . '</tr>';
+
+    $att = '-';
+    $html = $rowOpen . $att . $rowClose;
+
+    return [$html, $innerSum];
 }
 
 function sanitize_id($str) {
@@ -101,69 +206,56 @@ function toFloat(?string $s): float {
     return is_numeric($s) ? (float)$s : 0.0;
 }
 
-function xpathLiteral(string $s): string {
-    if (strpos($s, "'") === false) return "'$s'";
-    if (strpos($s, '"') === false) return "\"$s\"";
-    $parts = explode("'", $s);
-    return "concat('" . implode("', \"'\", '", $parts) . "')";
-}
+function getWAC_DB(PDO $pdo, int $bucketId, string $isin): array {
+    $stmt = $pdo->prepare("
+        SELECT Tipo, Quantita, PrezzoEseguito
+        FROM Operazione
+        WHERE ID_Bucket = ? AND ISIN = ?
+        ORDER BY DataOra ASC, ID_Operazione ASC
+    ");
+    $stmt->execute([$bucketId, $isin]);
+    $ops = $stmt->fetchAll();
 
-function backupAndSave(DOMDocument $xml, string $selectedPortfolio): string {
-    libxml_use_internal_errors(true);
+    $qty = 0.0;
+    $costTotal = 0.0;
 
-    if (!$xml->validate()){
-        return 'Errore validazione DOM';
-    }
+    foreach ($ops as $op) {
+        $tipo = (string)$op['Tipo'];
+        $q = (float)$op['Quantita'];
+        $p = (float)$op['PrezzoEseguito'];
 
+        if ($q <= 0) continue;
 
-    $final = __DIR__ . '/../data/' . $selectedPortfolio;
-    $tmp   = $final . '.tmp';
-    $bakCrumb = preg_replace('/.xml$/', '', pathinfo($selectedPortfolio, PATHINFO_FILENAME)) . '.';
-    $bak   = __DIR__ . '/../data/backup/' . $bakCrumb . date('Ymd-His') . '.bak';
+        if ($tipo === 'BUY') {
+            $costTotal += $q * $p;
+            $qty += $q;
+            continue;
+        }
 
-    if ($xml->save($tmp) === false) return 'Errore salvataggio temp';
+        if ($tipo === 'SELL') {
+            if ($qty <= 0) {
+                $qty = 0.0;
+                $costTotal = 0.0;
+                continue;
+            }
 
-    if (!savePretty($tmp)) {
-        unlink($tmp);
-        return 'Errore rettifica';
-    }
+            if ($q >= $qty) {
+                $qty = 0.0;
+                $costTotal = 0.0;
+                continue;
+            }
 
-    $check = new DOMDocument();
-    if (!$check->load($tmp)) {
-        unlink($tmp);
-        return 'Temp non ben formato';
-    }
-    if (!$check->validate()) {
-        unlink($tmp);
-        return 'Temp non conforme DTD';
-    }
-
-    copy($final, $bak);
-    if (!rename($tmp, $final)) {
-        unlink($tmp);
-        return 'Rename fallito';
-    }
-
-    return '';
-}
-
-function getWAC(DOMElement $asset, DOMXPath $xp): array {
-    $avgCost = 0.0;
-    $qtyCum  = 0.0;
-    foreach ($xp->query('operazioni/operazione', $asset) as $op) {
-        $qNode = $xp->query('quantita', $op)->item(0);
-        $pNode = $xp->query('prezzo',   $op)->item(0);
-        $q  = $qNode ? toFloat($qNode->textContent) : 0.0;
-        $pr = $pNode ? toFloat($pNode->textContent) : 0.0;
-        if ($q > 0) {
-            $avgCost = ($avgCost * $qtyCum + $q * $pr) / ($qtyCum + $q);
-            $qtyCum += $q;
-        } elseif ($q < 0) {
-            $qtyCum += $q;
+            $ratio = $q / $qty;
+            $costTotal -= $costTotal * $ratio;
+            $qty -= $q;
         }
     }
-    return [$avgCost, $qtyCum];
+
+    $avgCost = ($qty > 0) ? ($costTotal / $qty) : 0.0;
+
+    return [$avgCost, $qty];
 }
+
 
 function sendError($page, $msg) {
     header('Location: ' . $page . '?err=' . $msg, true, 303);

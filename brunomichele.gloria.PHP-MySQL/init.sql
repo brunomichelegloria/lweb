@@ -120,6 +120,7 @@ CREATE TABLE ContenutoAsset (
   ID_Bucket   BIGINT UNSIGNED NOT NULL,
   ISIN        CHAR(12)        NOT NULL,
   TargetPctNelBucket DECIMAL(7,4) NULL,
+  TaxRatePct DECIMAL(5,4) NOT NULL DEFAULT 0.260,
 
   PRIMARY KEY (ID_Bucket, ISIN),
 
