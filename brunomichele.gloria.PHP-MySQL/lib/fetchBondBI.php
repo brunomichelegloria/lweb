@@ -60,7 +60,6 @@ if (!debug_backtrace()) {
     $i = $_GET['ticker'] ?? '';
     $p = getPriceBondBI($i);
     if ($p <= 0) {
-        // Se vuoi mantenere l'errore per uso "manuale" da browser:
         echo json_encode(['error' => 'Invalid ISIN']);
     } else {
         echo json_encode(['price' => $p]);

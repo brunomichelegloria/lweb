@@ -1,0 +1,334 @@
+body {
+	display: flex;
+	background-image: url(./img/sand.png);
+	position: absolute;
+	max-height: 100vh;
+	height: 95vh; /* Da aggiustare, per qualche motivo il viewport non si adatta perfettamente */
+	max-width: 100vw;
+	width: 100vw;
+	overflow-x: hidden;
+	font-family: sans-serif;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	margin-top: 2vh;
+	margin-bottom: 3vh;
+	padding: 1vh;
+}
+
+.griglia { 
+	display: grid;
+	width: 80vw;
+	height: auto;
+	justify-content: center;
+	margin-top: 30vh;
+}
+
+.admin .griglia {
+	margin-top: 10vh;
+}
+
+.cella {
+	display: flex;
+	width: 6vh;
+	height: 4vw;
+	margin-top: 2vh;
+	margin-bottom: 2vh;
+	justify-content: center;
+	gap: 1vw;
+}
+
+.admin .coordinate {
+	position: absolute;
+	z-index: 2;
+}
+
+svg {
+	width: 6vh;
+	height: 4vw;
+	border: 0.1vh solid BurlyWood;
+}
+
+.admin svg {
+	width: 4vh;
+	height: 4vw;
+	border: #ddd;
+}
+
+#wave1, #wave2, #wave3 {
+	display: block;
+	position: absolute;
+	top: -10vh;
+	width: 200vw;
+	height: 50vh;
+	margin: 0;
+	padding: 0;
+	z-index: 1;
+	background-image: url(./img/wave.svg);
+	background-repeat: repeat-x;
+	background-position: top left;
+}
+
+#wave1 {
+	animation: scrollWave1 15s ease-in-out infinite;
+	background-size: 200vw 30vh;
+}
+#wave2 {
+	animation: scrollWave2 23s linear infinite;
+	background-size: 230vw 30vh;
+}
+#wave3 {
+	animation: scrollWave3 8s ease-in-out infinite;
+	background-size: 270vw 30vh;
+}
+
+@keyframes scrollWave1 {
+	0% { background-position: 0 0; }
+	50% { background-position: 200vw 10vh; }
+	100% { background-position: 400vw 0; }
+}
+@keyframes scrollWave2 {
+	0% { background-position: 30vw 0; }
+	50% { background-position: 230vw 0; }
+	100% { background-position: 460vw 0; }
+}
+@keyframes scrollWave3 {
+	0% { background-position: 70vw 0; }
+	50% { background-position: 270vw 8vh; }
+	100% { background-position: 540vw 0; }
+}
+
+svg.occupato path { fill: red;}
+svg.libero path { fill: green;}
+svg.abbonamento path { fill: darkviolet;}
+
+.sabbia { background-color: transparent; }
+.prato  {
+	background-image:
+		radial-gradient(rgb(0, 100, 0, 0.7) 50%, rgba(97, 157, 71, 0.6) 80%, rgba(152, 233, 118, 0.5)),
+		url(./img/grass.png);
+	background-repeat: repeat;
+}
+
+.admin .sabbia { background-color: #f5deb3; }  
+.admin .prato  { background-color: #b6f5b3; background-image: none;}
+
+#backIcon {
+    position: absolute;
+    top: 1vh;
+    left: 1vw;
+    width: 8vw;
+    height: 8vh;
+}
+
+#adminLoginIcon {
+	position: relative;
+	top: 2vh;
+	left: 3vw;
+	width: 4vw;
+	height: 4vh;
+	z-index: 10;
+}
+
+#adminLoginIcon:hover {
+	cursor: pointer;
+	opacity: 0.8;
+	transform: scale(1.1); ;
+}
+
+#adminLoginBox {
+	position: absolute;
+	top: 1vh;
+	left: 3vw;
+	width: auto;
+	height: auto;
+	z-index: 1000;
+}
+
+#adminLogin {
+	position: relative;
+	display: none;
+	left: 5vw;
+	background-color: rgb(173, 147, 113);
+	padding: 2vh;
+	border: 0.5vh solid rgb(173, 138, 93);
+	border-radius: 0.5vh;
+	z-index: 1000;
+}
+
+#adminLogin label {
+	display: block;
+	margin-top: 1vh;
+}
+
+#adminLogin input {
+	width: 100%;
+	margin-top: 0.3vh;
+}
+
+#adminLogin button {
+	margin-top: 1vh;
+}
+
+#userLoginBox {
+	position: absolute;
+	display: flex;
+	top: 0vh;
+	flex-direction: row;
+	align-items: center;
+	object-fit: contain;
+	direction: ltr;
+	right: 5vw;
+	width: auto;
+	flex-wrap: nowrap;
+	height: auto;
+	z-index: 1000;
+}
+
+#userLoginIcon {
+	position: relative;
+	transform-origin: 50% 50%;
+	width: 6vw;
+	height: auto;
+	z-index: 10;
+}
+#userLoginIcon.appear {
+    animation: onClickUserIcon .35s ease-out normal;
+}
+#userLoginIcon.disappear {
+	animation: onClickUserIcon .35s ease-in reverse;
+}
+
+#userLoginIconLabel {
+    position: absolute;
+	top: 0;
+	left: 23%;
+    margin-bottom: 0.3em;
+	font: '', sans-serif;
+    font-size: 8vw;
+	font-weight: 800;
+    color: #333;
+	z-index: 110;
+}
+
+#userLoginWrapper {
+	width: 0;
+	height: auto;
+	white-space: nowrap;
+	overflow-x: hidden;
+	transition: width .35s ease-in-out;
+}
+#userLoginWrapper.appear {
+    width:21vw;
+}
+#userLoginWrapper.disappear {
+	animation: onClickUserLogin .35s ease-in reverse;
+}
+
+#userLogin {
+	position: relative;
+	top: -0.5vw;
+	transform-origin: right center;
+	right: 0;
+	width: 20vw;
+	height: 15vh;
+	background-color: rgb(173, 147, 113);
+	padding: 2vh;
+	overflow-x: hidden;
+	border: 0.5vh solid rgb(173, 138, 93);
+	border-radius: 0.5vh;
+	z-index: 100;
+}
+
+@keyframes onClickUserIcon {
+	0% { transform:  rotateZ(0deg); }
+	100% { transform:  rotateZ(-360deg); }
+}
+
+@keyframes onClickUserLogin {
+	0% {width: 0;}
+	100% {width: 21vw;} 	
+}
+
+
+footer{
+	margin-top: auto;
+	padding-bottom: 1vh;
+}
+
+.tropicana {
+	width: 40vw;
+	height: auto;
+	align-self: center;
+}
+
+.admin #menuToggle {
+    position: absolute;
+    bottom: 10vh;
+    left: 5vw;
+    width: 8vw;
+    height: 8vh;
+    z-index: 1;
+}
+
+.admin #modificaMenu {
+    display: none;
+    position: absolute;
+    bottom: 10vh;
+    left: 15vw;
+    width: auto;
+    height: auto;
+    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.6);
+    border: 1px solid #ccc;
+    padding: 3vw;
+    gap: 2vh;
+}
+
+.admin #modificaMenu.flex {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+}
+
+.admin .switch {
+	position: relative;
+	display: inline-block;
+	width: 3vw;
+	height: 2vh;
+	margin-right: 1vw;
+}
+.admin .switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+.admin .slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgb(145, 197, 66);
+	transition: 0.4s;
+	border-radius: 2vh;
+}
+.admin .slider:before {
+	position: absolute;
+	content: "";
+	height: 1.6vh;
+	width: 1.4vh;
+	left: 0.2vw;
+	bottom: 0.2vh;
+	background-color: white;
+	transition: 0.4s;
+	border-radius: 50%;
+}
+.admin input:checked + .slider {
+	background-color: red;
+}
+.admin input:checked + .slider:before {
+	transform: translateX(2vw);
+}

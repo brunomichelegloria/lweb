@@ -112,6 +112,14 @@ $isRoot = ($scopeBucketId === $rootBucketId);
 
 $ignoredBucketDeletes = 0;
 
+$appliedCount = 0;
+$errorCount = 0;
+$lines = [];
+
+function addLine(array &$lines, string $s): void {
+    $lines[] = $s;
+}
+
 try {
     $pdo->beginTransaction();
 
@@ -158,6 +166,8 @@ try {
                 $userId
             ]);
 
+            $appliedCount++;
+            addLine($lines, "aggiornato portafoglio");
             continue;
         }
 
@@ -183,7 +193,9 @@ try {
                     $nome,
                     $target
                 ]);
-
+                
+                $appliedCount++;
+                addLine($lines, "aggiunto bucket: {$nome}");
                 continue;
             }
                        if ($idBucket <= 0) continue;
@@ -199,11 +211,16 @@ try {
             if ($isRemove) {
                 if (subtreeHasAnyAsset($pdo, $idBucket)) {
                     $ignoredBucketDeletes++;
+                    $errorCount++;
+                    addLine($lines, "errore bucket {$idBucket}: contiene asset nel sottoalbero; bucket non rimosso");
                     continue;
                 }
 
                 $del = $pdo->prepare("DELETE FROM Bucket WHERE ID_Bucket = ?");
                 $del->execute([$idBucket]);
+                
+                $appliedCount++;
+                addLine($lines, "rimosso bucket: {$idBucket}");
                 continue;
             }
 
@@ -216,6 +233,8 @@ try {
             ");
             $upd->execute([$nome, $target, $idBucket]);
 
+            $appliedCount++;
+            addLine($lines, "aggiornato bucket: {$nome}");
             continue;
         }
 
@@ -243,7 +262,11 @@ try {
             }
 
             $isin = trim($isin);
-            if ($isin === '') continue;
+            if ($isin === '') {
+                $errorCount++;
+                addLine($lines, "errore asset {$isin}: ISIN non valido; asset non aggiunto");
+                continue;
+            }
 
             if (!$isNew && $key !== '' && str_starts_with($key, 'A:')) {
                 $parts = explode(':', $key, 3);
@@ -257,6 +280,8 @@ try {
             if ($isRemove) {
                 $del = $pdo->prepare("DELETE FROM ContenutoAsset WHERE ID_Bucket = ? AND ISIN = ?");
                 $del->execute([$scopeBucketId, $isin]);
+                $appliedCount++;
+                addLine($lines, "rimosso asset: {$isin}");
                 continue;
             }
 
@@ -324,11 +349,30 @@ try {
             }
 
             if ($tipo === 'Azione') {
+                $ticker = trim((string)($fields['Ticker'] ?? ''));
+
+                if ($ticker === '') {
+                    $errorCount++;
+                    addLine($lines, "errore asset {$isin}: ticker mancante; asset non aggiunto");
+                    continue;
+                }
+
                 $stmt = $pdo->prepare("SELECT 1 FROM Azione WHERE ISIN = ? LIMIT 1");
                 $stmt->execute([$isin]);
-                if (!$stmt->fetch()) {
-                    $ins = $pdo->prepare("INSERT INTO Azione (ISIN) VALUES (?)");
-                    $ins->execute([$isin]);
+
+                if ($stmt->fetch()) {
+                    $upd = $pdo->prepare("
+                        UPDATE Azione
+                        SET Ticker = ?
+                        WHERE ISIN = ?
+                    ");
+                    $upd->execute([$ticker, $isin]);
+                } else {
+                    $ins = $pdo->prepare("
+                        INSERT INTO Azione (ISIN, Ticker)
+                        VALUES (?, ?)
+                    ");
+                    $ins->execute([$isin, $ticker]);
                 }
             }
 
@@ -351,9 +395,11 @@ try {
                     ");
                     $updO->execute([$scadenza, $cedola, $freq, $isin]);
                 } else {
-                    if ($scadenza === '') {
+                    /*if (trim($scadenza) === '') {
+                        $errorCount++;
+                        addLine($lines, "errore asset {$isin}: scadenza mancante; asset non aggiunto");
                         continue;
-                    }
+                    }    DA RI-AGGUNGERE A PROGETTO FINITO           */
                     $insO = $pdo->prepare("
                         INSERT INTO Obbligazione (ISIN, Scadenza, CedolaPct, FrequenzaCedola)
                         VALUES (?, ?, ?, NULLIF(?, ''))
@@ -374,32 +420,62 @@ try {
                     WHERE ID_Bucket = ? AND ISIN = ?
                 ");
                 $updC->execute([$targetNelBucket, $taxRatePct, $scopeBucketId, $isin]);
+                $appliedCount++;
+                addLine($lines, "aggiornato asset: {$isin}");
             } else {
                 $insC = $pdo->prepare("
                     INSERT INTO ContenutoAsset (ID_Bucket, ISIN, TargetPctNelBucket, TaxRatePct)
                     VALUES (?, ?, ?, COALESCE(?, 0.260))
                 ");
                 $insC->execute([$scopeBucketId, $isin, $targetNelBucket, $taxRatePct]);
+                $appliedCount++;
+                addLine($lines, "aggiunto asset: {$isin}");
             }
 
             continue;
         }
     }
 
-    $pdo->commit();
-
-    $msg = 'Modifiche salvate';
-    if ($ignoredBucketDeletes > 0) {
-        $msg .= " ({$ignoredBucketDeletes} rimozioni bucket ignorate: sottoalbero non vuoto)";
+    if ($appliedCount > 0) {
+        $pdo->commit();
+    } else {
+        $pdo->rollBack();
     }
 
-    $_SESSION['flash'] = ['msg' => $msg];
+    $title = 'Modifiche salvate';
+    $code = 20;
+
+    if ($errorCount > 0 && $appliedCount === 0) {
+        $title = 'Errore';
+        $code = 1;
+    } else if ($errorCount > 0 && $appliedCount > 0) {
+        $title = 'Modifiche parziali';
+        $code = 2;
+    }
+
+    if ($appliedCount === 0 && $errorCount === 0) {
+        $lines[] = 'nessuna modifica da applicare';
+    }
+
+    $_SESSION['flash'] = [
+        'title' => $title,
+        'details' => $lines,
+        'code' => $code
+    ];
+
     header('Location: ../portfolio.php?id=' . $portfolioId);
     exit;
+
 } catch (Throwable $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
 
-    $_SESSION['flash'] = ['msg' => 'Errore durante il salvataggio'];
+    $_SESSION['flash'] = [
+        'title' => 'Errore',
+        'details' => [
+            $e->getMessage() . ". Operazione annullata."
+        ],
+        'code' => 1
+    ];
     header('Location: ../portfolio.php?id=' . $portfolioId);
     exit;
 }

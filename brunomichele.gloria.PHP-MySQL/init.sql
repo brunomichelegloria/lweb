@@ -59,6 +59,7 @@ CREATE TABLE ETF (
 
 CREATE TABLE Azione (
   ISIN        CHAR(12) NOT NULL,
+  Ticker      VARCHAR(15) NOT NULL,
 
   PRIMARY KEY (ISIN),
   FOREIGN KEY (ISIN) REFERENCES Asset(ISIN)
@@ -66,7 +67,7 @@ CREATE TABLE Azione (
 
 CREATE TABLE Obbligazione (
   ISIN        CHAR(12)     NOT NULL,
-  Scadenza    DATE         NOT NULL,
+  Scadenza    DATE         NOT NULL DEFAULT '9999-12-31',
   CedolaPct   DECIMAL(7,4) NULL,
   FrequenzaCedola ENUM('Annuale','Semestrale','Triennale','Mensile') NULL,
 

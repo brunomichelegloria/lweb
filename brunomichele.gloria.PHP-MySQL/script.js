@@ -100,15 +100,7 @@ function generaGrafico(liqAttualePerc) {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        generateLabels: chart => {
-                            return chart.data.labels.map((label, i) => ({
-                                text: label,
-                                fillStyle: colors[i],
-                                strokeStyle: '#fff',
-                                lineWidth: 1,
-                                index: i
-                            }));
-                        }
+						color: '#ccc',
                     }
                 },
                 tooltip: {
@@ -284,6 +276,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		if (btnRemove) {
 			btnRemove.addEventListener('click', () => {
+				const inpNew = fieldset.querySelector('input[name$="[new]"]');
+				if (inpNew && inpNew.value === '1') {
+					fieldset.remove();
+					return;
+				}
+
 				const inpRemove = fieldset.querySelector('input[name$="[remove]"]');
 				const now = !(inpRemove && inpRemove.value === '1');
 				setFieldsetRemoved(fieldset, now);
@@ -336,6 +334,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		const isinEl = fieldset.querySelector(`[name="assets[${idToken}][ISIN]"]`);
 		if (isinEl) { isinEl.disabled = true; isinEl.value = asset.ISIN ?? ''; }
+
+		const tickerEl = fieldset.querySelector(`[name="assets[${idToken}][Ticker]"]`);
+		if (isinEl) { tickerEl.disabled = true; tickerEl.value = asset.Ticker ?? ''; }
 
 		const idBucketEl = fieldset.querySelector(`[name="assets[${idToken}][ID_Bucket]"]`);
 		if (idBucketEl) { idBucketEl.disabled = true; idBucketEl.value = asset.ID_Bucket; }
@@ -643,5 +644,149 @@ document.addEventListener('DOMContentLoaded', () => {
 		form.submit();
 	});
 
-    generaGrafico(0);
+	const opsPopover = document.getElementById('ops-popover');
+	const opsQty = document.getElementById('ops-qty');
+	const opsPrice = document.getElementById('ops-price');
+	const opsIsSell = document.getElementById('ops-is-sell');
+	const opsTypeLabel = document.getElementById('ops-type-label');
+	const opsSubmit = document.getElementById('ops-submit');
+
+	function closeOpsPopover() {
+		if (!opsPopover) return;
+		opsPopover.style.display = 'none';
+		delete opsPopover.dataset.bucketId;
+		delete opsPopover.dataset.isin;
+	}
+
+	function setOpsTypeFromToggle() {
+		if (!opsIsSell || !opsTypeLabel) return;
+		opsTypeLabel.textContent = opsIsSell.checked ? 'Vendi' : 'Acquista';
+	}
+
+	function openOpsPopoverForRow(btn, row) {
+		if (!opsPopover || !row) return;
+
+		const bucketId = row.dataset.bucketId;
+		const isin = row.dataset.isin;
+
+		if (!bucketId || !isin) {
+			alert('Dati mancanti: bucket-id o ISIN');
+			return;
+		}
+
+		opsPopover.dataset.bucketId = bucketId;
+		opsPopover.dataset.isin = isin;
+
+		if (opsQty) {
+			opsQty.value = '';
+			opsQty.step = '1';
+			opsQty.min = '1';
+		}
+
+		if (opsPrice) {
+			const p = parseFloat(row.dataset.prezzo || '');
+			const wac = parseFloat(row.dataset.costo || '');
+			const use = (Number.isFinite(p) && p > 0) ? p : ((Number.isFinite(wac) && wac > 0) ? wac : '');
+			opsPrice.value = (use === '') ? '' : String(use);
+		}
+
+		if (opsIsSell) {
+			opsIsSell.checked = false;
+			setOpsTypeFromToggle();
+		}
+
+		const r = btn.getBoundingClientRect();
+		const left = window.scrollX + r.left;
+		const top = window.scrollY + r.bottom + 8;
+
+		opsPopover.style.left = `${left}px`;
+		opsPopover.style.top = `${top}px`;
+		opsPopover.style.display = 'flex';
+	}
+
+	opsIsSell?.addEventListener('change', setOpsTypeFromToggle);
+
+	document.addEventListener('click', (e) => {
+		const gear = e.target.closest('button[data-role="ops-gear"]');
+		if (gear) {
+			const row = gear.closest('tr.asset-row');
+			openOpsPopoverForRow(gear, row);
+			return;
+		}
+
+		if (!opsPopover) return;
+
+		const clickedInside = opsPopover.contains(e.target);
+		if (clickedInside) return;
+
+		closeOpsPopover();
+	});
+
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') closeOpsPopover();
+	});
+
+	opsSubmit?.addEventListener('click', () => {
+		if (!opsPopover) return;
+
+		const portfolioId = parseInt(document.getElementById('asset-dialog-portfolioId')?.value || '0', 10) || 0;
+		const bucketId = parseInt(opsPopover.dataset.bucketId || '0', 10) || 0;
+		const isin = opsPopover.dataset.isin || '';
+
+		const qty = parseInt(opsQty?.value || '0', 10);
+		const price = parseFloat(opsPrice?.value || '');
+
+		if (!portfolioId || !bucketId || !isin) {
+			alert('Dati mancanti');
+			return;
+		}
+
+		if (!Number.isFinite(qty) || qty <= 0) {
+			alert('Quantità non valida');
+			return;
+		}
+
+		if (!Number.isFinite(price) || price < 0) {
+			alert('Prezzo non valido');
+			return;
+		}
+
+		const tipo = (opsIsSell && opsIsSell.checked) ? 'SELL' : 'BUY';
+
+		const form = document.createElement('form');
+		form.method = 'POST';
+		form.action = 'lib/addOperation.php';
+
+		const add = (name, value) => {
+			const inp = document.createElement('input');
+			inp.type = 'hidden';
+			inp.name = name;
+			inp.value = String(value);
+			form.appendChild(inp);
+		};
+
+		add('portfolioId', portfolioId);
+		add('bucketId', bucketId);
+		add('isin', isin);
+		add('tipo', tipo);
+		add('qty', qty);
+		add('price', price);
+
+		document.body.appendChild(form);
+		form.submit();
+	});
+
+	document.addEventListener('click', (e) => {
+		var helpers = document.querySelectorAll('.help-btn');
+		helpers.forEach(helper => {
+			if (helper.contains(e.target)) {
+				var helpBtnClass = helper.className.split(' ')[0];
+				var helperText = document.querySelector(`p.${helpBtnClass}`);
+				helperText.style.opacity = helperText.style.opacity === '0.7' ? '0' : '0.7';
+			}
+		});
+	});
+	
+	let liq=parseFloat(document.getElementById('liquidita-totale')?.dataset.liqPerc || 0);
+    generaGrafico(liq);
 });

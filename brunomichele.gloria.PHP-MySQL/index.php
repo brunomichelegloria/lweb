@@ -70,6 +70,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 						<?php foreach ($errors as $e): ?>
 						<li><?= h($e) ?></li>
 						<?php endforeach; ?>
+						<?php if (isset($_SESSION['flash'])): ?>
+							<li>
+								<strong><?= h($_SESSION['flash']['title']) ?></strong>
+								<p><?= h(implode(', ', $_SESSION['flash']['details'])) ?></p>
+							</li>
+						<?php endif; ?>
 					</ul>
 				</div>
 				<?php endif; ?>

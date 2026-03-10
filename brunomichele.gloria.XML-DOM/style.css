@@ -227,44 +227,39 @@ tr.bucket-details-even > td {
 }
 
 
-/* Il contenitore <dialog> non deve avere padding/bordi suoi */
+
 #asset-dialog {
   padding: 0;
-  border: none;            /* togli il bordo UA */
+  border: none;
   border-radius: 12px;
 }
 
-/* Sfondo scuro dietro la finestra */
 #asset-dialog::backdrop {
   background: rgba(0,0,0,.35);
 }
 
-/* Il FORM funge da “cornice” della finestra */
+
 #asset-form {
-  /* DIMENSIONI FISSE (con limiti responsivi) */
-  width: 900px;            /* fisso desktop */
-  max-width: 92vw;         /* non uscire dal viewport */
-  height: 68vh;            /* finestra “fissa” in altezza */
-  max-height: 720px;       /* tetto in px se preferisci */
+  width: 900px;   
+  max-width: 92vw;  
+  height: 68vh;   
+  max-height: 720px;
   
-  /* Cornice + estetica */
   background: rgb(31, 31, 31);
-  border: 2px solid #d0d7de;      /* la cornice */
+  border: 2px solid #d0d7de;
   border-radius: 12px;
   box-shadow: 0 22px 60px rgba(0,0,0,.25);
-  overflow: hidden;                /* clip angoli arrotondati */
+  overflow: hidden;     
   color: #ccc;
 
-  /* Layout per tenere il footer in basso */
   display: flex;
   flex-direction: column;
 }
 
-/* Area scorrevole con gli asset */
 #asset-form .dialog-body {
-  flex: 1 1 auto;          /* occupa tutto lo spazio disponibile */
-  min-height: 0;           /* importante per Safari/Edge, abilita lo scroll interno */
-  overflow: auto;          /* solo questa parte scorre */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
   padding: 16px;
 }
 

@@ -13,12 +13,13 @@ if ($portfolioId <= 0) {
 }
 
 $stmt = $pdo->prepare("
-    SELECT ID_Portafoglio, Nome, Liquidita, TargetLiquiditaPct, Tolleranza, Commissione, TipoCommissione, ID_Radice
+    SELECT ID_Portafoglio, Nome, Valuta, Liquidita, TargetLiquiditaPct, Tolleranza, Commissione, TipoCommissione, ID_Radice
     FROM Portafoglio
     WHERE ID_Portafoglio = ? AND ID_Utente = ?
 ");
 $stmt->execute([$portfolioId, $userId]);
 $pf = $stmt->fetch();
+$valuta = $pf['Valuta'] ?? 'EUR';
 
 if (!$pf) {
     http_response_code(404);
@@ -82,6 +83,10 @@ if ($rootRow) {
 
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
+$flashTitle = $flash['title'] ?? null;
+$flashDetails = $flash['details'] ?? [];
+$flashCode = (int)($flash['code'] ?? 20);
+if (!is_array($flashDetails)) $flashDetails = [];
 ?>
 <!doctype html>
 <html lang="it">
@@ -93,7 +98,7 @@ unset($_SESSION['flash']);
         <link rel="stylesheet" href="portfolio.css">
         <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='90'%3E🚀%3C/text%3E%3C/svg%3E">
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src=" https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js "></script>
         <script defer src="script.js"></script>
     </head>
 
@@ -118,9 +123,9 @@ unset($_SESSION['flash']);
             <h1 class="pf-title"><?= h((string)($pf['Nome'] ?? '')) ?></h1>
             <p class="pf-subtitle">Gestione portafoglio e ribilanciamento</p>
 
-            <?php if ($flash): ?>
-                <div class="pf-flash">
-                <?= h((string)($flash['msg'] ?? '')) ?>
+            <?php if ($flashTitle): ?>
+                <div class="pf-flash <?= $flashCode === 1 ? 'pf-flash-error' : ($flashCode === 2 ? 'pf-flash-warn' : 'pf-flash-ok') ?>">
+                    <?= h((string)$flashTitle) ?>
                 </div>
             <?php endif; ?>
 
@@ -145,114 +150,83 @@ unset($_SESSION['flash']);
 
                         <tbody id="bucket-tbody">
                         <?php
-                            $tbodyHtml = '';
-                            $totalSum = 0.0;
+                            	$pdo = getPDO();
 
-                            $pdo = getPDO();
+                                [$tbodyHtml, $totalSum] = renderRootChildrenDB($pdo, $rootBucketId, $bucketById, $childrenMap, $pf['Liquidita'] ?? 0.0);
 
-                            $stmtRootAssets = $pdo->prepare("
-                                SELECT
-                                    ca.ID_Bucket,
-                                    ca.ISIN,
-                                    ca.TargetPctNelBucket,
-                                    ca.TaxRatePct,
-                                    a.Nome AS AssetNome,
-                                    a.Valuta,
-                                    a.Tipo,
-                                    e.Ticker
-                                FROM ContenutoAsset ca
-                                INNER JOIN Asset a ON a.ISIN = ca.ISIN
-                                LEFT JOIN ETF e ON e.ISIN = a.ISIN
-                                WHERE ca.ID_Bucket = ?
-                                ORDER BY a.Tipo, a.Nome, ca.ISIN
-                            ");
-                            $stmtRootAssets->execute([$rootBucketId]);
-                            $rootAssets = $stmtRootAssets->fetchAll();
-
-                            foreach ($rootAssets as $r) {
-                                $tipo = strtolower((string)$r['Tipo']);
-                                $nome = (string)($r['AssetNome'] ?? ($r['Ticker'] ?? $r['ISIN']));
-                                $isin = (string)$r['ISIN'];
-                                $valuta = (string)($r['Valuta'] ?? 'EUR');
-                                $ticker = (string)($r['Ticker'] ?? '');
-
-                                [$avgCost, $qty] = getWAC_DB($pdo, $rootBucketId, $isin);
-
-                                $targetRaw = $r['TargetPctNelBucket'];
-                                $targetPrint = ($targetRaw === null) ? '-' : number_format((float)$targetRaw, 2, ',', '.');
-
-                                $tbodyHtml .=
-                                    '<tr class="asset-row" data-type="' . h($tipo) . '"'
-                                    . ' data-nome="' . h($nome) . '"'
-                                    . ' data-isin="' . h($isin) . '"'
-                                    . ' data-ticker="' . h($ticker) . '"'
-                                    . ' data-quantita="' . h((string)$qty) . '"'
-                                    . ' data-valuta="' . h($valuta) . '"'
-                                    . ' data-target-raw="' . h($targetPrint) . '">'
-                                    . '<td class="edit-cell"><button type="button" class="edit-button" data-role="ops-gear">⚙️</button></td>'
-                                    . '<td class="tipo">' . h($tipo) . '</td>'
-                                    . '<td class="nome">' . h($nome) . '</td>'
-                                    . '<td class="quantita">' . h((string)$qty) . '</td>'
-                                    . '<td class="prezzo">-</td>'
-                                    . '<td class="valore">-</td>'
-                                    . '<td class="attuale">-</td>'
-                                    . '<td class="target">' . h($targetPrint) . '</td>'
-                                    . '<td class="delta-qty">-</td>'
-                                    . '</tr>';
-                            }
-
-                            foreach ($childrenMap[$rootBucketId] ?? [] as $childId) {
-                                [$h, $s] = renderBucketsDB((int)$childId, $bucketById, $childrenMap, '');
-                                $tbodyHtml .= $h;
-                                $totalSum += $s;
-                            }
-
-                            if ($tbodyHtml === '') {
-                                echo '<tr><td class="pf-empty" colspan="9">Portafoglio vuoto.</td></tr>';
-                            } else {
-                                echo $tbodyHtml;
-                            }
+                                if ($tbodyHtml === '') {
+                                    echo '<tr><td class="pf-empty" colspan="9">Portafoglio vuoto.</td></tr>';
+                                } else {
+                                    echo $tbodyHtml;
+                                }
                         ?>
                         </tbody>
 
+                        
+                        <tfoot>
+                            <tr>
+                                <td id="footer-data" colspan="9">
+                                    <div class="pf-tablefooter">
+                                        <?php
+                                        $liqAttuale = (float)($pf['Liquidita'] ?? 0);
+                                        $liqPerc = ($totalSum > 0.0) ? ($liqAttuale / ($totalSum + $liqAttuale)) * 100.0 : 0.0;
+                                        ?>
+                                        <span id="liquidita-totale" data-liq-target="<?= h((string)$pf['TargetLiquiditaPct']) ?>" data-liq-perc="<?= h((string)number_format((float)$liqPerc, 2, '.', '')) ?>">
+                                            Liquidità: <strong><?= h(number_format((float)$pf['Liquidita'], 2, ',', '.')) . (valutaToSimbolo($valuta) ?? '€') ?></strong>
+                                        </span>
+                                        <span class="pf-footer-sep">|</span>
+                                        <span>Target liquidità: <strong><?= h(preg_replace('/[,.][0]+$/', '', number_format((float)$pf['TargetLiquiditaPct'], 3, ',', '.'))) ?>%</strong></span>
+                                        <span class="pf-footer-sep">|</span>
+                                        <span>Tolleranza: <strong><?= h(preg_replace('/[,.][0]+$/', '', number_format((float)$pf['Tolleranza'], 3, ',', '.'))) ?>%</strong></span>
+                                        <span class="pf-footer-sep">|</span>
+                                        <span>
+                                            Commissione:
+                                            <strong><?= h(preg_replace('/[,.][0]+$/', '', number_format((float)($pf['Commissione'] ?? 0), 4, ',', '.'))) . (valutaToSimbolo($valuta) ?? '€') ?></strong>
+                                            (<?= h((string)$pf['TipoCommissione']) ?>)
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
 
-                    <tfoot>
-                        <tr>
-                            <td id="footer-data" colspan="9">
-                                <div class="pf-tablefooter">
-                                    <span id="liquidita-totale" data-liq-target="<?= h((string)$pf['TargetLiquiditaPct']) ?>">
-                                        Liquidità: <strong><?= h(number_format((float)$pf['Liquidita'], 2, ',', '.')) ?> €</strong>
-                                    </span>
-                                    <span class="pf-footer-sep">|</span>
-                                    <span>Target liquidità: <strong><?= h(number_format((float)$pf['TargetLiquiditaPct'], 3, ',', '.')) ?>%</strong></span>
-                                    <span class="pf-footer-sep">|</span>
-                                    <span>Tolleranza: <strong><?= h(number_format((float)$pf['Tolleranza'], 3, ',', '.')) ?>%</strong></span>
-                                    <span class="pf-footer-sep">|</span>
-                                    <span>
-                                        Commissione:
-                                        <strong><?= h(number_format((float)($pf['Commissione'] ?? 0), 4, ',', '.')) ?></strong>
-                                        (<?= h((string)$pf['TipoCommissione']) ?>)
-                                    </span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tfoot>
-
                     <div class="ops-forms-container">
-                        <div class="helper-form">
+                        <form id="cumulForm" class="helper-form" action="lib/cumula.php" method="POST" onsubmit="return confirm('Lo storico delle operazioni verrà perso. Confermi l\'operazione?')">
+                            <input type="hidden" name="portfolio_id" value="<?= h($portfolioId) ?>">
                             <div id="cumulBox">
-                                <button id="cumul-btn" class="btn-mini" type="button">Cumula operazioni</button>
-                                <button class="help-btn btn-mini" type="button" title="Aiuto">?</button>
+                                <button id="cumul-btn" class="btn-mini" type="submit">Cumula operazioni</button>
+                                <button class="cumul-meta-help btn-mini help-btn" type="button" title="Aiuto">?</button>
                             </div>
-                            <div class="help-text">Cumula BUY/SELL per ottenere la quantità attuale.</div>
-                        </div>
+                            <p class="cumul-meta-help help-text">
+                                <br>Cumula operazioni" trasforma lo storico delle operazioni effettuate
+                                <br>su ogni asset in un'unica operazione datata ad oggi con quantità e prezzo
+                                <br>di acquisto tali da mantenere equivalente l'allocazione in portafoglio e
+                                <br>la tassazione in fase di vendita.
+                            </p>
+                        </form>
 
-                        <div class="helper-form">
-                            <button id="rebalance-btn" class="btn-mini" type="button">Ribilancia portafoglio</button>
-                            <div class="help-text">Calcola le quote da comprare/vendere per raggiungere i target.</div>
-                        </div>
+                        <form id="rebalanceForm" class="helper-form" action="lib/rebalance.php" method="GET" onsubmit="return confirm('Confermi di voler ribilanciare il portafoglio in base ai target impostati?\nL\'azione potrebbe richedere del tempo variabile, dipendentemente dal numero di asset in portafoglio.')">
+                            <input type="hidden" name="portfolio_id" value="<?= h($portfolioId) ?>">
+                            <div id="rebalanceBox">
+                                <button id="rebalance-btn" class="btn-mini" type="submit">Ribilancia portafoglio</button>
+                                <button id="rebalance-help" class="rebalance-meta-help btn-mini help-btn" type="button">?</button>
+                            </div>
+                            <p class="rebalance-meta-help help-text">
+                                <br>Ribilancia portafoglio" simulando operazioni di acquisto e vendita
+                                <br>per trovare un allocazione del portafoglio più vicina ai
+                                <br>target percentuali impostati su ogni asset.
+                                <br>(Utilizzabile anche per decidere come investire nuova liquidit&agrave;.)
+                            </p>
+                        </form>
                     </div>
+                    
+                    <?php if (!empty($flashDetails)): ?>
+                        <div class="pf-flash-details">
+                            <?php foreach ($flashDetails as $line): ?>
+                                <div class="pf-flash-line"><?= h((string)$line) ?></div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <div id="graph-wrap">
@@ -267,11 +241,11 @@ unset($_SESSION['flash']);
 
             <div id="ops-form">
                 <div class="ops-switch">
+                    <span id="ops-type-label">BUY</span>
                     <label class="switch">
                         <input type="checkbox" id="ops-is-sell">
                         <span class="slider"></span>
-                    </label>
-                    <span id="ops-type-label">BUY</span>
+                    </label>  
                 </div>
 
                 <div>
@@ -390,6 +364,10 @@ unset($_SESSION['flash']);
                             <input name="assets[__ID__][ISIN]" required disabled>
                         </label>
 
+                        <label>Ticker:
+                            <input name="assets[__ID__][Ticker]" required disabled placeholder="AAPL">
+                        </label>
+
                         <label>Nome:
                             <input name="assets[__ID__][Nome]" disabled>
                         </label>
@@ -434,6 +412,10 @@ unset($_SESSION['flash']);
                             <input name="assets[__ID__][Ticker]" required disabled placeholder="ACWI.MI">
                         </label>
 
+                        <label>ISIN:
+                            <input name="assets[__ID__][ISIN]" required disabled>
+                        </label>
+
                         <label>Nome:
                             <input name="assets[__ID__][Nome]" disabled>
                         </label>
@@ -446,7 +428,6 @@ unset($_SESSION['flash']);
                         <input type="hidden" name="assets[__ID__][new]" value="0" disabled>
                         <input type="hidden" name="assets[__ID__][remove]" value="0" disabled>
                         <input type="hidden" name="assets[__ID__][ID_Bucket]" value="" disabled>
-                        <input type="hidden" name="assets[__ID__][ISIN]" value="" disabled>
                     </div>
 
                     <details class="template-etf-details">

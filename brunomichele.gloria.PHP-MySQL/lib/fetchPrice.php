@@ -26,6 +26,6 @@ function getPriceYahoo(string $ticker): float {
 if (!debug_backtrace()) {
     header('Content-Type: application/json; charset=utf-8');
     $t = $_GET['ticker'] ?? '';
-    echo json_encode(['price' => price_for_equity($t)]);
+    echo json_encode(['price' => getPriceYahoo($t)]);
     exit;
 }

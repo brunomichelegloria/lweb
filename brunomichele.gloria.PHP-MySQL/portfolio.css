@@ -139,6 +139,7 @@ tfoot td#footer-data {
     flex-wrap: wrap;
     margin-left: 5vw;
     margin-right: 0;
+    
 }
 
 #graph {
@@ -181,13 +182,13 @@ tfoot td#footer-data {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    width: 100%;
+    width: 93.7%;
     margin-top: 12px;
     gap: 20px;
 }
 
 .helper-form {
-    display: flex;
+    display: inline;
     flex-direction: column;
     align-items: flex-start;
     padding: 0;
@@ -448,6 +449,38 @@ a[href*="logout.php"] {
     border-radius: 8px;
 }
 
+.pf-flash-ok {
+    background: #ccc;
+    color: #111;
+    border-color: #ccc;
+}
+
+.pf-flash-error {
+    background: #ff6b6b;
+    color: #111;
+    border-color: #b94a4a;
+}
+
+.pf-flash-warn {
+    background: #ffd166;
+    color: #111;
+    border-color: #c6a23b;
+}
+
+.pf-flash-details {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background: rgba(204, 204, 204, 0.1);
+    border-radius: 8px;
+}
+
+.pf-flash-line {
+    padding: 2px 0;
+    white-space: pre-wrap;
+    opacity: 0.9;
+}
+
 .bucket-zone-even {
     background-color: rgb(16, 16, 16);
 }
@@ -475,4 +508,9 @@ a[href*="logout.php"] {
     max-width: 20vw;
     text-align: center;
     background: rgb(31, 31, 31);
+}
+
+
+.chartjs-legend{
+    color: #ca0000 !important;
 }
