@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+require_once __DIR__ . '/lib/connection.php';
 require_once __DIR__ . '/lib/misc.php';
 
 $flash = $_SESSION['flash'] ?? null;
@@ -51,7 +51,7 @@ $portfolios = $stmt->fetchAll();
     <head>
         <meta charset="utf-8">
         <title>Seleziona Portafoglio</title>
-        <link rel="stylesheet" href="selector.css">
+        <link rel="stylesheet" href="lib/selector.css">
     </head>
 
     <body>

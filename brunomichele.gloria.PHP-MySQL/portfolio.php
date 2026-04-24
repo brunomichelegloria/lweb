@@ -1,13 +1,14 @@
 <?php
 session_start();
 require_once __DIR__ . '/lib/misc.php';
+require_once __DIR__ . '/lib/connection.php';
 
 $pdo = getPDO();
 $user = requireLogin($pdo);
 $userId = (int)$user['ID_Utente'];
 
 $portfolioId = (int)($_GET['id'] ?? 0);
-if ($portfolioId <= 0) {
+if (!$portfolioId || $portfolioId <= 0) {
     header('Location: selectPortfolio.php');
     exit;
 }
@@ -81,6 +82,22 @@ if ($rootRow) {
     }
 }
 
+$rebalanceResult = $_SESSION['rebalance_result'] ?? null;
+
+$rebalanceMap = [];
+if (is_array($rebalanceResult) && !empty($rebalanceResult['ops']) && is_array($rebalanceResult['ops'])) {
+    foreach ($rebalanceResult['ops'] as $op) {
+        $bucketId = (int)($op['bucketId'] ?? 0);
+        $isin = (string)($op['isin'] ?? '');
+        if ($bucketId > 0 && $isin !== '') {
+            $rebalanceMap[$bucketId . '|' . $isin] = [
+                'deltaQty' => (float)($op['deltaQty'] ?? 0),
+                'note' => (string)($op['note'] ?? '')
+            ];
+        }
+    }
+}
+
 $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
 $flashTitle = $flash['title'] ?? null;
@@ -95,11 +112,11 @@ if (!is_array($flashDetails)) $flashDetails = [];
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <title><?= h($_SESSION['username'] ?? 'User') ?> - <?= h($pf['Nome'] ?? 'none') ?></title>
 
-        <link rel="stylesheet" href="portfolio.css">
+        <link rel="stylesheet" href="lib/portfolio.css">
         <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='90'%3E🚀%3C/text%3E%3C/svg%3E">
 
         <script src=" https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js "></script>
-        <script defer src="script.js"></script>
+        <script defer src="lib/script.js"></script>
     </head>
 
     <body>
@@ -152,7 +169,7 @@ if (!is_array($flashDetails)) $flashDetails = [];
                         <?php
                             	$pdo = getPDO();
 
-                                [$tbodyHtml, $totalSum] = renderRootChildrenDB($pdo, $rootBucketId, $bucketById, $childrenMap, $pf['Liquidita'] ?? 0.0);
+                                [$tbodyHtml, $totalSum] = renderRootChildrenDB($pdo, $rootBucketId, $bucketById, $childrenMap, $pf['Liquidita'] ?? 0.0, $rebalanceMap);
 
                                 if ($tbodyHtml === '') {
                                     echo '<tr><td class="pf-empty" colspan="9">Portafoglio vuoto.</td></tr>';
@@ -171,6 +188,8 @@ if (!is_array($flashDetails)) $flashDetails = [];
                                         $liqAttuale = (float)($pf['Liquidita'] ?? 0);
                                         $liqPerc = ($totalSum > 0.0) ? ($liqAttuale / ($totalSum + $liqAttuale)) * 100.0 : 0.0;
                                         ?>
+                                        <span id="total-valore">Valore totale: <strong><?= h(number_format((float)$totalSum, 2, ',', '.')) . (valutaToSimbolo($valuta) ?? '€') ?></strong></span>
+                                        <span class="pf-footer-sep">|</span>
                                         <span id="liquidita-totale" data-liq-target="<?= h((string)$pf['TargetLiquiditaPct']) ?>" data-liq-perc="<?= h((string)number_format((float)$liqPerc, 2, '.', '')) ?>">
                                             Liquidità: <strong><?= h(number_format((float)$pf['Liquidita'], 2, ',', '.')) . (valutaToSimbolo($valuta) ?? '€') ?></strong>
                                         </span>
@@ -207,6 +226,7 @@ if (!is_array($flashDetails)) $flashDetails = [];
 
                         <form id="rebalanceForm" class="helper-form" action="lib/rebalance.php" method="GET" onsubmit="return confirm('Confermi di voler ribilanciare il portafoglio in base ai target impostati?\nL\'azione potrebbe richedere del tempo variabile, dipendentemente dal numero di asset in portafoglio.')">
                             <input type="hidden" name="portfolio_id" value="<?= h($portfolioId) ?>">
+                            <input type="hidden" name="portfolio_id" value="<?= h($portfolioId) ?>">
                             <div id="rebalanceBox">
                                 <button id="rebalance-btn" class="btn-mini" type="submit">Ribilancia portafoglio</button>
                                 <button id="rebalance-help" class="rebalance-meta-help btn-mini help-btn" type="button">?</button>
@@ -216,6 +236,7 @@ if (!is_array($flashDetails)) $flashDetails = [];
                                 <br>per trovare un allocazione del portafoglio più vicina ai
                                 <br>target percentuali impostati su ogni asset.
                                 <br>(Utilizzabile anche per decidere come investire nuova liquidit&agrave;.)
+                                <br>E' necessario ricalcolare il bilanciamento ad ogni modifica del portafoglio.
                             </p>
                         </form>
                     </div>
@@ -433,10 +454,6 @@ if (!is_array($flashDetails)) $flashDetails = [];
                     <details class="template-etf-details">
                         <summary>Dettagli</summary>
 
-                        <label>ISIN:
-                            <input name="assets[__ID__][ISIN_DETAILS]" disabled>
-                        </label>
-
                         <label>Tax rate (%):
                             <input type="number" step="0.01" min="0" max="100" name="assets[__ID__][TaxRate]" disabled>
                         </label>
@@ -473,20 +490,24 @@ if (!is_array($flashDetails)) $flashDetails = [];
             <fieldset class="asset-field" data-kind="obbligazione">
                 <div class="template-div">
                     <p>Obbligazione</p>
-
+                    
                     <div class="template-obbligazione-main">
                         <label>ISIN:
                             <input name="assets[__ID__][ISIN]" required disabled>
                         </label>
-
+                        
                         <label>Nome:
                             <input name="assets[__ID__][Nome]" disabled>
                         </label>
-
+                        
                         <label>Target:
                             <input type="number" step="0.01" min="0" max="100" name="assets[__ID__][TargetPctNelBucket]" disabled>
                         </label>
-
+                        
+                        <label>Scadenza:
+                            <input type="date" name="assets[__ID__][Scadenza]" disabled>
+                        </label>
+                        
                         <input type="hidden" name="assets[__ID__][tipo]" value="Obbligazione" disabled>
                         <input type="hidden" name="assets[__ID__][new]" value="0" disabled>
                         <input type="hidden" name="assets[__ID__][remove]" value="0" disabled>
@@ -510,7 +531,7 @@ if (!is_array($flashDetails)) $flashDetails = [];
 
                         <label>Frequenza cedola:
                             <select name="assets[__ID__][FrequenzaCedola]" disabled>
-                                <option value=""></option>
+                                <option value="">-</option>
                                 <option value="Annuale">Annuale</option>
                                 <option value="Semestrale">Semestrale</option>
                                 <option value="Triennale">Triennale</option>
@@ -518,9 +539,6 @@ if (!is_array($flashDetails)) $flashDetails = [];
                             </select>
                         </label>
 
-                        <label>Scadenza:
-                            <input type="date" name="assets[__ID__][Scadenza]" disabled>
-                        </label>
                     </details>
                 </div>
 

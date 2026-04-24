@@ -1,5 +1,5 @@
-DROP DATABASE IF EXISTS portfolio_db;
+DROP DATABASE IF EXISTS `{{DB_NAME}}`;
 
-DROP USER IF EXISTS 'portfolio_app'@'localhost';
+DROP USER IF EXISTS '{{DB_USER}}'@'{{DB_HOST}}';
 
 FLUSH PRIVILEGES;

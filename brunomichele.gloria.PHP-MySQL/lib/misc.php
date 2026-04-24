@@ -2,27 +2,7 @@
 require_once __DIR__ . '/fetchPrice.php';
 require_once __DIR__ . '/fetchBondInvesting.php';
 require_once __DIR__ . '/fetchBondBI.php';
-
-function getPDO(): PDO {
-    static $pdo = null;
-    if ($pdo instanceof PDO) return $pdo;
-
-    $host = 'localhost';
-    $db   = 'portfolio_db';
-    $user = 'portfolio_app';
-    $pass = 'CambiaQuestaPassword!';
-    $charset = 'utf8mb4';
-
-    $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
-    ]);
-
-    return $pdo;
-}
+require_once __DIR__ . '/connection.php';
 
 function priceCacheInit(): void {
 	if (!isset($_SESSION['priceCache']) || !is_array($_SESSION['priceCache'])) {
@@ -232,9 +212,25 @@ function buildAssetRowPartsDB(
 	float $unitPrice,
 	string $targetPrint,
 	string $prezzoPrint,
-	string $valorePrint
+	string $valorePrint,
+    array $rebalanceMap = []
     ): array {
 	$tipo = strtolower($tipo);
+
+    $rebKey = ((int)$bucketId) . '|' . $isin;
+    $deltaQty = isset($rebalanceMap[$rebKey]) ? (float)$rebalanceMap[$rebKey]['deltaQty'] : 0.0;
+    $deltaNote = isset($rebalanceMap[$rebKey]) ? (string)$rebalanceMap[$rebKey]['note'] : '';
+    $deltaClass = 'delta-default';
+
+    if ($deltaQty > 0) {
+        $deltaPrint = '+' . rtrim(rtrim(number_format($deltaQty, 6, '.', ''), '0'), '.');
+        $deltaClass = 'delta-buy';
+    } elseif ($deltaQty < 0) {
+        $deltaPrint = rtrim(rtrim(number_format($deltaQty, 6, '.', ''), '0'), '.');
+        $deltaClass = 'delta-sell';
+    } else {
+        $deltaPrint = '-';
+    }
 
 	$rowOpen =
 		'<tr class="asset-row" data-type="' . h($tipo) . '"'
@@ -259,13 +255,13 @@ function buildAssetRowPartsDB(
 	$rowClose =
 		'</td>' . "\n"
 		. '<td class="target">' . h($targetPrint) . '</td>' . "\n"
-		. '<td class="delta-qty">-</td>' . "\n"
+		. '<td class="delta-qty"' . ($deltaNote !== '' ? ' title="' . h($deltaNote) . '"' : '') . '>' . h($deltaPrint) . '</td>' . "\n"
 		. '</tr>' . "\n";
 
 	return [$rowOpen, $rowClose];
 }
 
-function renderBucketChildrenDB(PDO $pdo, int $bucketId, array $bucketById, array $childrenMap, string $parentPath): array {
+function renderBucketChildrenDB(PDO $pdo, int $bucketId, array $bucketById, array $childrenMap, string $parentPath, array $rebalanceMap = []): array {
     $childrenItems = [];
     $sum = 0.0;
 
@@ -304,7 +300,7 @@ function renderBucketChildrenDB(PDO $pdo, int $bucketId, array $bucketById, arra
         if ($tipo === 'obbligazione') {
             $unitPrice = getCachedBondPrice($isin);
         } else {
-            $t = ($tipo === 'etf' && $ticker !== '') ? $ticker : $isin;
+            $t = (($tipo === 'etf' || $tipo === 'azione') && $ticker !== '') ? $ticker : $isin;
             $unitPrice = getCachedPriceYahoo($t);
         }
 
@@ -335,7 +331,8 @@ function renderBucketChildrenDB(PDO $pdo, int $bucketId, array $bucketById, arra
             (float)$unitPrice,
             $targetPrint,
             $prezzoPrint,
-            $valorePrint
+            $valorePrint,
+            $rebalanceMap
         );
 
         $childrenItems[] = [
@@ -350,7 +347,7 @@ function renderBucketChildrenDB(PDO $pdo, int $bucketId, array $bucketById, arra
     $childBucketSums = [];
 
     foreach ($childBucketIds as $childId) {
-        [, $sChild] = renderBucketsDB((int)$childId, $bucketById, $childrenMap, $parentPath, 0.0);
+        [, $sChild] = renderBucketsDB((int)$childId, $bucketById, $childrenMap, $parentPath, 0.0, $rebalanceMap);
         $childBucketSums[(int)$childId] = (float)$sChild;
         $sum += (float)$sChild;
     }
@@ -359,7 +356,7 @@ function renderBucketChildrenDB(PDO $pdo, int $bucketId, array $bucketById, arra
     $denom = $sum;
 
     foreach ($childBucketIds as $childId) {
-        [$hChild, $sChild] = renderBucketsDB((int)$childId, $bucketById, $childrenMap, $parentPath, $denom);
+        [$hChild, $sChild] = renderBucketsDB((int)$childId, $bucketById, $childrenMap, $parentPath, $denom, $rebalanceMap);
 
         $childrenItems[] = [
             'type' => 'bucket',
@@ -384,7 +381,7 @@ function renderBucketChildrenDB(PDO $pdo, int $bucketId, array $bucketById, arra
     return [$html, $denom];
 }
 
-function renderBucketsDB(int $bucketId, array $bucketById, array $childrenMap, string $parentPath, float $parentDenom): array {
+function renderBucketsDB(int $bucketId, array $bucketById, array $childrenMap, string $parentPath, float $parentDenom, array $rebalanceMap = []): array {
     $pdo = getPDO();
 
     $b = $bucketById[$bucketId];
@@ -395,7 +392,7 @@ function renderBucketsDB(int $bucketId, array $bucketById, array $childrenMap, s
     $childPath = $parentPath . '/' . sanitize_id($name);
     $colore = (substr_count($childPath, '/') % 2 === 0) ? 'bucket-details-even' : 'bucket-details-odd';
 
-    [$innerHtml, $innerSum] = renderBucketChildrenDB($pdo, $bucketId, $bucketById, $childrenMap, $childPath);
+    [$innerHtml, $innerSum] = renderBucketChildrenDB($pdo, $bucketId, $bucketById, $childrenMap, $childPath, $rebalanceMap);
 
     $targetPrint = ($targetRaw === null) ? '-' : number_format((float)$targetRaw, 2, ',', '.');
 
@@ -412,8 +409,13 @@ function renderBucketsDB(int $bucketId, array $bucketById, array $childrenMap, s
     $rowClose =
         '</td>' . "\n"
         . '<td class="target">' . h($targetPrint) . '</td>' . "\n"
-        . '<td class="delta-qty">-</td>' . "\n"
-        . '<td class="toggle-details-cell"><button type="button" class="toggle-details-button" data-toggle="' . (int)$bucketId . '">&#9664;</button></td>' . "\n"
+        . '<td class="delta-qty" style="text-align:center;">'
+            . '<div style="display:inline-block; white-space:nowrap;">'
+                . '<button style="visibility:hidden;">&#9664;</button>' // Bottone invisibile per allineamento
+                . '<span style="display:inline-block;">-</span>'
+                . '<button type="button" class="toggle-details-button" data-toggle="' . (int)$bucketId . '" style="position:relative;right:-40px;">&#9664;</button>'
+            . '</div>'
+        . '</td>' . "\n"
         . '</tr>' . "\n"
         . '<tr class="bucket-details ' . h($colore) . '" data-details-of="' . (int)$bucketId . '">' . "\n"
         . '<td colspan="9"><table class="bucket-table"><tbody>' . "\n"
@@ -427,7 +429,7 @@ function renderBucketsDB(int $bucketId, array $bucketById, array $childrenMap, s
     return [$html, $innerSum];
 }
 
-function renderRootChildrenDB(PDO $pdo, int $rootBucketId, array $bucketById, array $childrenMap, float $liquidita): array {
+function renderRootChildrenDB(PDO $pdo, int $rootBucketId, array $bucketById, array $childrenMap, float $liquidita, array $rebalanceMap = []): array {
 	$childrenItems = [];
 	$sum = 0.0;
 
@@ -467,7 +469,7 @@ function renderRootChildrenDB(PDO $pdo, int $rootBucketId, array $bucketById, ar
 		if ($tipo === 'obbligazione') {
 			$unitPrice = getCachedBondPrice($isin);
 		} else {
-			$t = ($tipo === 'etf' && $ticker !== '') ? $ticker : $isin;
+			$t = (($tipo === 'etf' || $tipo === 'azione') && $ticker !== '') ? $ticker : $isin;
 			$unitPrice = getCachedPriceYahoo($t);
 		}
 
@@ -498,7 +500,8 @@ function renderRootChildrenDB(PDO $pdo, int $rootBucketId, array $bucketById, ar
 			(float)$unitPrice,
 			$targetPrint,
 			$prezzoPrint,
-			$valorePrint
+			$valorePrint,
+            $rebalanceMap
 		);
 
 		$childrenItems[] = [
@@ -513,7 +516,7 @@ function renderRootChildrenDB(PDO $pdo, int $rootBucketId, array $bucketById, ar
     $childBucketSums = [];
 
     foreach ($childBucketIds as $childId) {
-        [, $sChild] = renderBucketsDB((int)$childId, $bucketById, $childrenMap, '', 0.0);
+        [, $sChild] = renderBucketsDB((int)$childId, $bucketById, $childrenMap, '', 0.0, $rebalanceMap);
         $childBucketSums[(int)$childId] = (float)$sChild;
         $sum += (float)$sChild;
     }
@@ -522,7 +525,7 @@ function renderRootChildrenDB(PDO $pdo, int $rootBucketId, array $bucketById, ar
 	$denom = $sum + max(0.0, $liquidita);
 
     foreach ($childBucketIds as $childId) {
-        [$hChild, $sChild] = renderBucketsDB((int)$childId, $bucketById, $childrenMap, '', $denom);
+        [$hChild, $sChild] = renderBucketsDB((int)$childId, $bucketById, $childrenMap, '', $denom, $rebalanceMap);
 
         $childrenItems[] = [
             'type' => 'bucket',

@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (isinEl) { isinEl.disabled = true; isinEl.value = asset.ISIN ?? ''; }
 
 		const tickerEl = fieldset.querySelector(`[name="assets[${idToken}][Ticker]"]`);
-		if (isinEl) { tickerEl.disabled = true; tickerEl.value = asset.Ticker ?? ''; }
+		if (tickerEl) { tickerEl.disabled = true; tickerEl.value = asset.Ticker ?? ''; }
 
 		const idBucketEl = fieldset.querySelector(`[name="assets[${idToken}][ID_Bucket]"]`);
 		if (idBucketEl) { idBucketEl.disabled = true; idBucketEl.value = asset.ID_Bucket; }
@@ -505,9 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (json.isRoot && json.portfolioInfo) {
 			addPortfolioInfoFieldset(json.portfolioInfo, portfolioId);
 		}
-
-		(json.childBuckets || []).forEach(b => addBucketFieldset(b, false));
-
+		
 		(json.assets || []).forEach(a => {
 			if (a.Tipo === 'ETF') {
 				addEtfFieldset(a, false);
@@ -518,6 +516,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		});
 
+		(json.childBuckets || []).forEach(b => addBucketFieldset(b, false));
+		
 		dialog.showModal();
 	}
 
@@ -541,6 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		addAzioneFieldset({
 			ID_Bucket: editorState.openBucketId,
 			ISIN: '',
+			Ticker: '',
 			Nome: '',
 			TargetPctNelBucket: '',
 			TaxRatePct: null,
@@ -733,7 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const bucketId = parseInt(opsPopover.dataset.bucketId || '0', 10) || 0;
 		const isin = opsPopover.dataset.isin || '';
 
-		const qty = parseInt(opsQty?.value || '0', 10);
+		const qty = parseFloat(opsQty?.value || '');
 		const price = parseFloat(opsPrice?.value || '');
 
 		if (!portfolioId || !bucketId || !isin) {

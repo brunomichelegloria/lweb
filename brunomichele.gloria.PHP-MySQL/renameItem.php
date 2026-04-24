@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/misc.php';
+require_once __DIR__ . '/lib/connection.php';
+require_once __DIR__ . '/lib/misc.php';
 
 $pdo = getPDO();
 $user = requireLogin($pdo);
@@ -101,7 +102,7 @@ $title = ($type === 'folder') ? 'Rinomina Cartella' : 'Rinomina Portafoglio';
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <title><?= h($title) ?></title>
-        <link rel="stylesheet" href="../selector.css">
+        <link rel="stylesheet" href="lib/selector.css">
     </head>
 
     <body>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+require_once __DIR__ . '/lib/connection.php';
 require_once __DIR__ . '/lib/misc.php';
 
 $errors = [];

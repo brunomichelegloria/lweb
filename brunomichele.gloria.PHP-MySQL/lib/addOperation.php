@@ -5,6 +5,7 @@ require_once __DIR__ . '/misc.php';
 $pdo = getPDO();
 $user = requireLogin($pdo);
 $userId = (int)$user['ID_Utente'];
+unset($_SESSION['rebalance_result']);
 
 $portfolioId = (int)($_POST['portfolioId'] ?? 0);
 $bucketId = (int)($_POST['bucketId'] ?? 0);

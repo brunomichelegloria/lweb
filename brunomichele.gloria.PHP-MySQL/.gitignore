@@ -3,3 +3,4 @@ data/GB.xml
 log_*.txt
 *.log
 *.bak
+*.code-workspace

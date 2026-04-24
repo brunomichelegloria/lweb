@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/connection.php';
 require_once __DIR__ . '/misc.php';
 
 $pdo = getPDO();
@@ -107,7 +108,11 @@ $stmt = $pdo->prepare("
         a.Valuta,
         a.Tipo,
         a.Borsa,
-        e.Ticker,
+        CASE
+            WHEN a.Tipo = 'ETF' THEN e.Ticker
+            WHEN a.Tipo = 'Azione' THEN az.Ticker
+            ELSE NULL
+        END AS Ticker,
         e.TER,
         e.Distribuzione,
         e.Indice,
@@ -117,6 +122,7 @@ $stmt = $pdo->prepare("
     FROM ContenutoAsset ca
     INNER JOIN Asset a ON a.ISIN = ca.ISIN
     LEFT JOIN ETF e ON e.ISIN = a.ISIN
+    LEFT JOIN Azione az ON az.ISIN = a.ISIN
     LEFT JOIN Obbligazione o ON o.ISIN = a.ISIN
     WHERE ca.ID_Bucket = ?
     ORDER BY a.Tipo, a.Nome, ca.ISIN
@@ -135,12 +141,12 @@ foreach ($assetRows as $r) {
         'Nome' => $r['AssetNome'] !== null ? (string)$r['AssetNome'] : '',
         'Valuta' => (string)$r['Valuta'],
         'Borsa' => $r['Borsa'] !== null ? (string)$r['Borsa'] : '',
+        'Ticker' => $r['Ticker'] !== null ? (string)$r['Ticker'] : '',
         'TargetPctNelBucket' => $r['TargetPctNelBucket'] !== null ? (float)$r['TargetPctNelBucket'] : null,
         'TaxRatePct' => $r['TaxRatePct'] !== null ? (float)$r['TaxRatePct'] : null,
     ];
 
     if ($tipo === 'ETF') {
-        $item['Ticker'] = $r['Ticker'] !== null ? (string)$r['Ticker'] : '';
         $item['TER'] = $r['TER'] !== null ? (float)$r['TER'] : null;
         $item['Distribuzione'] = $r['Distribuzione'] !== null ? (string)$r['Distribuzione'] : 'Accumulating';
         $item['Indice'] = $r['Indice'] !== null ? (string)$r['Indice'] : '';

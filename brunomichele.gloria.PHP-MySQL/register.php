@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+require_once __DIR__ . '/lib/connection.php';
 require_once __DIR__ . '/lib/misc.php';
 
 
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<title>Registrazione</title>
-		<link rel="stylesheet" href="selector.css">
+		<link rel="stylesheet" href="lib/selector.css">
 	</head>
 
 	<body>

@@ -326,12 +326,15 @@ tfoot td#footer-data {
 .asset-field label {
     word-break: keep-all;
     hyphens: manual;
+    display: inline-block;
+    white-space: nowrap;
 }
 
 #asset-form hr {
     border: 0;
     border-top: 1px solid #eee;
     margin: 12px 0;
+    padding-bottom: 50px;
 }
 
 @media (max-width: 600px) {
@@ -513,4 +516,16 @@ a[href*="logout.php"] {
 
 .chartjs-legend{
     color: #ca0000 !important;
+}
+
+.delta-buy {
+    color: #4caf50;
+}
+.delta-sell {
+    color: #f44336;
+}
+
+.asset-actions {
+    display: inline-block;
+    white-space: nowrap;
 }

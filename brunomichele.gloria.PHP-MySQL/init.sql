@@ -1,16 +1,16 @@
 -- ===== DB + USER ======
-SET NAMES utf8mb4;
+CREATE DATABASE IF NOT EXISTS `{{DB_NAME}}`
+    CHARACTER SET `{{DB_CHARSET}}`
+    COLLATE `{{DB_COLLATE}}`;
 
-CREATE DATABASE IF NOT EXISTS portfolio_db
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS '{{DB_USER}}'@'{{DB_HOST}}' IDENTIFIED BY '{{DB_PASS}}';
 
-CREATE USER IF NOT EXISTS 'portfolio_app'@'localhost' IDENTIFIED BY 'CambiaQuestaPassword!';
-    GRANT SELECT, INSERT, UPDATE, DELETE
-    ON portfolio_db.* TO 'portfolio_app'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON `{{DB_NAME}}`.* TO '{{DB_USER}}'@'{{DB_HOST}}';
+
 FLUSH PRIVILEGES;
 
-USE portfolio_db;
+USE `{{DB_NAME}}`;
 
 -- ===== TABELLE =====
 

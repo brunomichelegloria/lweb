@@ -27,20 +27,45 @@ This software is provided “as is”, **without any warranty of any kind**, exp
 No license. This is a private academic project.  
 **Not intended for reuse or redistribution.**
 
-NOTE:
-  -Autore: Bruno Michele Gloria
+---
 
-  -Esercizi di riferimento: Nuovamente mi scuso per non avere degli espliciti esercizi a cui ho fatto riferimento. Ho semplicemente cercato di usare gli strumenti mostrati a lezione e nelle slide, per poi imparare nuovi strumenti quando necessario.
+## NOTE:
 
-  -Principi utilizzati: In questo progetto l’obiettivo era dimostrare l’utilizzo del modello DOM (Document Object Model) per la manipolazione di un file XML contenente dati strutturati.
-  Ho sviluppato un’applicazione per la gestione e il ribilanciamento di un portafoglio finanziario, così da poter applicare in modo variegato le operazioni di lettura, modifica e salvataggio di dati XML.
-  Il file XML è validato tramite DTD, mentre il DOM è stato utilizzato sia in PHP, per elaborare e aggiornare il file, sia in JavaScript, per leggere e interagire con la pagina HTML generata dinamicamente dal server.
+-Autore: Bruno Michele Gloria
 
-  -Path richiesto dai file: Se non ho commesso errori dovrebbe bastare spostare la cartella dell'homework all'interno di una qualsiasi locazione del localhost. Ho provato a renderlo indipendente dal path usando le variabili globali di sistema. D'altra parte, non so come testare efficacemente la correttezza senza provare su un altro dispositivo.
+-Esercizi di riferimento: Anche in questo caso non ho fatto riferimento a un esercizio specifico delle slide. Ho utilizzato gli strumenti presentati a lezione (PHP, MySQL, gestione form, sessioni, PDO) integrandoli in un progetto unico più strutturato.
 
-  -Funzionalità ed utilizzo: index.php si occupa di gestire un piccolo e limitato filesystem così da rendere possibile visualizzare, aggiungere, rimuovere i file contenenti i portafogli, olre che importare un precedente file di backup generato successivamente ad una qualunque modifica in un portafoglio. Accedendo ad un portafoglio viene inviata la pagina gestionalePortafoglio.php, che fornisce un elenco degli asset in portafoglio ed una piccola analisi del loro stato (la percentuale occupata in portafoglio), mostrata anche tramite grafico a torta. I prezzi degli asset vengono rischiesti a yahooFinance quando possibile, altrimenti viene fatto scraping da alcune pagine (motivo per cui i dati nel file .xml sono limitati, lo scraping comporta dei limiti a cosa posso salvare per ragioni legali); questi prezzi vengono poi salvati in una variabile di sessione così da limitare il numero di chiamate a questi servizi.
-  Le operazioni disponibili sono: aggiunta, rimozione e modifica di asset o bucket (i buckets sono l'equivalente di cartelle di asset) tramite modifyAssets.php, aggiunta di operazioni di acquisto o vendita, e un operazione di cumulazione la quale converte lo storico delle operazioni passate in un'unica operazione dal valore fiscale equivalente tramite addOps.php, il calcolo delle operazioni necessarie al ribilanciamento del portafoglio tramite rebalance.php. Nei primi due file uso DOM per accedere direttamente al file XML, ed eseguire le azioni richieste una alla volta; nell'ultimo ho preferito usare usarlo per leggere l'interità del file e creare un albero con i suoi contenuti.
-  Come richiesto alla consegna del precedente compito ho integrato in questo la parte mancante sull'utilizzo dei form, utilizzando i metodi POST per le operazioni e GET per le comunicazioni tra le pagine.
-  
-  -Github: https://github.com/brunomichelegloria/lweb/tree/main/brunomichele.gloria.XML-DOM
-  
+-Principi utilizzati: Il progetto estende il precedente lavoro basato su XML sostituendo il file con un database relazionale MySQL.
+Ho progettato uno schema EER e la relativa traduzione logica per gestire portafogli finanziari, bucket gerarchici e asset.
+L’applicazione utilizza PHP con PDO per l’accesso al database, prepared statements per la sicurezza, e sessioni per la gestione degli utenti.
+È presente uno script di installazione (install.php) che permette di creare e inizializzare automaticamente il database.
+
+-Installazione e configurazione:
+Per installare il progetto è sufficiente:
+
+1. Modificare il file lib/dati_generali.php inserendo:
+
+   * credenziali DBMS
+   * nome database
+   * utente e password demo
+
+2. Aprire da browser il file:
+   install.php
+
+3. Inserire le credenziali amministrative MySQL richieste dalla pagina.
+
+L’installazione crea database, tabelle e dati demo.
+
+Dopo l’installazione è possibile accedere da:
+index.php
+utilizzando le credenziali demo definite in dati_generali.php.
+
+P.S. non ho modo di testare su computer diversi dal mio, spero funzioni tutto.
+
+-Funzionalità ed utilizzo:
+L’applicazione permette di creare e gestire portafogli organizzati in cartelle, definire bucket gerarchici e inserire asset (azioni, ETF, obbligazioni).
+È possibile registrare operazioni di acquisto e vendita e visualizzare lo stato del portafoglio.
+È implementato un algoritmo di ribilanciamento che calcola automaticamente le operazioni necessarie per riallineare il portafoglio ai target definiti, tenendo conto di tolleranza, commissioni, tassazione e vincoli sulle quantità.
+Una volta effettuato il ribilanciamento è possibile visualizzare le flags generate dall'algoritmo per il singolo asset 'hoverando' la relativa cella deltaQty (hanno nomi leggermente indecifrabili, ma lasciano un'idea sufficiente).
+
+-Github: [https://github.com/brunomichelegloria/lweb/tree/main/brunomichele.gloria.PHP-MySQL](https://github.com/brunomichelegloria/lweb/tree/main/brunomichele.gloria.PHP-MySQL)

@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/connection.php';
 require_once __DIR__ . '/misc.php';
 
 $pdo = getPDO();
@@ -8,6 +9,8 @@ $userId = (int)$user['ID_Utente'];
 
 $payloadRaw = $_POST['payload'] ?? '';
 $payload = json_decode($payloadRaw, true);
+
+unset($_SESSION['rebalance_result']);
 
 if (!is_array($payload)) {
     http_response_code(400);
@@ -294,9 +297,8 @@ try {
             $taxPctInput = parseNullableFloat($fields['TaxRate'] ?? null);
             $taxRatePct = null;
             if ($taxPctInput !== null) {
-                $taxRatePct = $taxPctInput / 100.0;
+                if ($taxRatePct > 1) $taxRatePct = $taxPctInput / 100.0;
                 if ($taxRatePct < 0) $taxRatePct = 0.0;
-                if ($taxRatePct > 1) $taxRatePct = 1.0;
             }
 
             $stmt = $pdo->prepare("SELECT ISIN, Tipo FROM Asset WHERE ISIN = ?");
